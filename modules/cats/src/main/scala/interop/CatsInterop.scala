@@ -33,7 +33,6 @@ given [F[_]: Functor]: Endofunctor[Any, Scal, Function, F] =
 
 given [F[_]: CatsMonad]: Monad[Any, Scal, Function, F] =
   new Monad[Any, Scal, Function, F] {
-
     type Pure[A] = Morphism[Any, Scal, Function, A, F[A]]
     type Flatten[A] = Morphism[Any, Scal, Function, FF[A], F[A]]
 
@@ -41,7 +40,14 @@ given [F[_]: CatsMonad]: Monad[Any, Scal, Function, F] =
     val pure: Transform[IdK[Any], F] =
       val funK = functionK[Any, Scal, Pure](_ => Morphism(summon, CatsMonad[F].pure, summon))
       Nat(funK)
-    def flatMap[A, B](f: A -> F[B]): F[A] -> F[B] =
-      val arrow = (fa: F[A]) => CatsMonad[F].flatMap(fa)(f.arrow)
-      Morphism(summon, arrow, summon)
+    
+    val flatten: Transform[FF, F] = new Transform[FF, F] {
+      def apply[A](ob: Scal[A]): FF[A] ~> F[A] =
+        val arrow: FF[A] => F[A] = CatsMonad[F].flatten[A]
+        arrow.toMorphism[Scal](summon, summon)
+    }
+
+    def fmap[A, B](f: A -> B): F[A] -> F[B] =
+      val arrow: F[A] => F[B] = CatsMonad[F].map(_)(f.arrow)
+      arrow.toMorphism[Scal](summon, summon)
   }

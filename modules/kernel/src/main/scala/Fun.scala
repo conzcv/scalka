@@ -30,8 +30,8 @@ object HomFunctor {
     R <: K
   ](using  C: Cat[K, Ob, Arr]): HomFunctor[K, Ob, Arr, R] = new HomFunctor[K, Ob, Arr, R] {
     def fmap[A <: K, B <: K](f: A -> B): (R -> A) ~> (R -> B) =
-      val array: (R -> A) => (R -> B) = _ >> f 
-      array.toMorphism[Scal](summon, summon)
+      val arrow: (R -> A) => (R -> B) = _ >> f 
+      arrow.toMorphism[Scal](summon, summon)
   }
 }
 
