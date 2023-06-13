@@ -3,10 +3,13 @@ package scalka.interop.cats
 import cats.arrow.Category
 import cats.~>
 import cats.arrow.FunctionK
-import cats.Functor
-import scalka.kernel.{Cat, Morphism, Endofunctor}
+import cats.{Functor, Monad => CatsMonad}
+import scalka.kernel.{Cat, Morphism, Endofunctor, Monad}
 import scalka.kernel.types._
 import cats.syntax.compose._
+import scalka.kernel.Nat
+import scalka.syntax.functionK._
+import scalka.kernel.toMorphism
 
 given Cat[AnyK, ScalK, ~>] = new Cat[AnyK, ScalK, ~>] {
   def compose[F[_], G[_], H[_]](f: G -> H, g: F -> G): F -> H =
@@ -26,4 +29,19 @@ given [F[_]: Functor]: Endofunctor[Any, Scal, Function, F] =
   new Endofunctor[Any, Scal, Function, F] {
     def fmap[A, B](f: A -> B): F[A] ~> F[B] =
       Morphism(summon, Functor[F].fmap(_)(f.arrow), summon)
+  }
+
+given [F[_]: CatsMonad]: Monad[Any, Scal, Function, F] =
+  new Monad[Any, Scal, Function, F] {
+
+    type Pure[A] = Morphism[Any, Scal, Function, A, F[A]]
+    type Flatten[A] = Morphism[Any, Scal, Function, FF[A], F[A]]
+
+    val category: Cat[Any, Scal, Function] = summon
+    val pure: Transform[IdK[Any], F] =
+      val funK = functionK[Any, Scal, Pure](_ => Morphism(summon, CatsMonad[F].pure, summon))
+      Nat(funK)
+    def flatMap[A, B](f: A -> F[B]): F[A] -> F[B] =
+      val arrow = (fa: F[A]) => CatsMonad[F].flatMap(fa)(f.arrow)
+      Morphism(summon, arrow, summon)
   }

@@ -2,6 +2,7 @@ package scalka.kernel
 
 package object types {
   type Id[+A] = A
+  type IdK[K <: AnyKind] = [A <: K] =>> A
   type AnyK = [A] =>> Any
 
   sealed trait Scal[A]
@@ -22,4 +23,7 @@ package object types {
     [F[A <: SKind] <: DKind] =>> Fun[SKind, SOb, SArr, DKind, DOb, DArr, F],
     [F[A <: SKind] <: DKind, G[A <: SKind] <: DKind] =>> Nat[SKind, SOb, DKind, DOb, DArr, F, G]
   ]
+
+  type EndoNat[K <: AnyKind, Ob[A <: K], Arr[A <: K, B <: K], F[A <: K] <: K, G[A <: K] <: K] =
+    Nat[K, Ob, K, Ob, Arr, F, G]
 }

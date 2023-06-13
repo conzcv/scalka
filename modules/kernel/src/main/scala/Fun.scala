@@ -19,12 +19,21 @@ trait Fun[
   def fmap[A <: SKind, B <: SKind](f: A -> B): F[A] ~> F[B]
 }
 
-trait Endofunctor[
-  Kind <: AnyKind,
-  Ob[A <: Kind],
-  Arr[A <: Kind, B <: Kind],
-  F[A <: Kind] <: Kind
-] extends Fun[Kind, Ob, Arr, Kind, Ob, Arr, F]
+sealed trait HomFunctor[
+  K <: AnyKind, Ob[A <: K], Arr[A <: K, B <: K],
+  R <: K
+] extends Fun[K, Ob, Arr, Any, Scal, Function, [B <: K] =>> Morphism[K, Ob, Arr, R, B]]
+
+object HomFunctor {
+  def apply[
+    K <: AnyKind, Ob[A <: K], Arr[A <: K, B <: K],
+    R <: K
+  ](using  C: Cat[K, Ob, Arr]): HomFunctor[K, Ob, Arr, R] = new HomFunctor[K, Ob, Arr, R] {
+    def fmap[A <: K, B <: K](f: A -> B): (R -> A) ~> (R -> B) =
+      val array: (R -> A) => (R -> B) = _ >> f 
+      array.toMorphism[Scal](summon, summon)
+  }
+}
 
 sealed trait FunInstances {
   val liftSubtyping = new Fun[Any, Scal, <:<, Any, Scal, Function, Id] {
