@@ -13,16 +13,18 @@ import scalka.syntax.functionK._
 import scalka.kernel.toMorphism
 
 given Cat[AnyK, ScalK, ~>] = new Cat[AnyK, ScalK, ~>] {
-  def compose[F[_], G[_], H[_]](f: G -> H, g: F -> G): F -> H =
-    Morphism(g.domain, f.arrow compose g.arrow, f.codomain)
+
+  def composeArrows[F[_], G[_], H[_]](f: CatsFunctionK[G, H], g: CatsFunctionK[F, G]): CatsFunctionK[F, H] =
+    f compose g
 
   def id[F[_]](ob: ScalK[F]): F -> F =
     Morphism(ob, CatsFunctionK.id[F], ob)
 }
 
 given [Arr[_, _]: Category]: Cat[Any, Scal, Arr] = new Cat[Any, Scal, Arr]  {
-  def compose[A, B, C](f: B -> C, g: A -> B): A -> C =
-    Morphism(g.domain, g.arrow >>> f.arrow, f.codomain)
+
+  def composeArrows[A, B, C](f: Arr[B, C], g: Arr[A, B]): Arr[A, C] =
+    g >>> f
   def id[A](ob: Scal[A]): A -> A = Morphism(ob, Category[Arr].id[A], ob)
 }
 

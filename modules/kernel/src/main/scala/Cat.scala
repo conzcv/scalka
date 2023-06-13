@@ -8,7 +8,10 @@ trait Cat[Kind <: AnyKind, Ob[A <: Kind], Arr[A <: Kind, B <: Kind]] {
   final type Arrow[A <: Kind, B <: Kind] = Arr[A, B]
   final type ->[A <: Kind, B <: Kind] = Morphism[Kind, Ob, Arr, A, B]
 
-  def compose[A <: Kind, B <: Kind, C <: Kind](f: B -> C, g: A -> B): A -> C
+  def composeArrows[A <: Kind, B <: Kind, C <: Kind](f: Arr[B, C], g: Arr[A, B]): Arr[A, C]
+
+  final def compose[A <: Kind, B <: Kind, C <: Kind](f: B -> C, g: A -> B): A -> C =
+    Morphism(g.domain, composeArrows(f.arrow, g.arrow), f.codomain)
 
   def id[A <: Kind](ob: Object[A]): A -> A
 }
@@ -19,15 +22,15 @@ extension [Kind <: AnyKind, Ob[A <: Kind], A <: Kind](obj: Ob[A]) {
 
 sealed trait CatInstances {
   given Cat[Any, Scal, Function] = new Cat[Any, Scal, Function] {
-    def compose[A, B, C](f: B -> C, g: A -> B): A -> C =
-      Morphism(g.domain, f.arrow compose g.arrow, f.codomain)
+    def composeArrows[A, B, C](f: B => C, g: A => B): A => C =
+      f compose g
     def id[A](ob: Object[A]): A -> A =
       Morphism(ob, identity, ob)
   }
 
   given Cat[Any, Scal, <:<] = new Cat[Any, Scal, <:<]  {
-    def compose[A, B, C](f: B -> C, g: A -> B): A -> C =
-      Morphism(g.domain, f.arrow compose g.arrow, f.codomain)
+    def composeArrows[A, B, C](f: B <:< C, g: A <:< B): A <:< C =
+      f compose g
     def id[A](ob: Object[A]): A -> A =
       Morphism(ob, summon, ob)
   }
@@ -37,15 +40,14 @@ sealed trait CatInstances {
     DKind <: AnyKind, DOb[A <: DKind], DArr[A <: DKind, B <: DKind]
   ](using S: Cat[SKind, SOb, SArr], D: Cat[DKind, DOb, DArr]): FunctorCat[SKind, SOb, SArr, DKind, DOb, DArr] =
     new FunctorCat[SKind, SOb, SArr, DKind, DOb, DArr] {
-      def compose[
+
+      def composeArrows[
         F[A <: SKind] <: DKind,
         G[A <: SKind] <: DKind,
         H[A <: SKind] <: DKind
-      ](f: G -> H, g: F -> G): F -> H = {
+      ](f: Nat[SKind, SOb, DKind, DOb, DArr, G, H], g: Nat[SKind, SOb, DKind, DOb, DArr, F, G]): Nat[SKind, SOb, DKind, DOb, DArr, F, H] =
         type Transformation[A <: SKind] = Morphism[DKind, DOb, DArr, F[A], H[A]]
-        val funK = functionK[SKind, SOb, Transformation](ob => g.arrow(ob) >> f.arrow(ob))
-        Morphism(g.domain, Nat(funK), f.codomain)
-      }
+        Nat(functionK[SKind, SOb, Transformation](ob => g(ob) >> f(ob)))
 
       def id[F[A <: SKind] <: DKind](obj: Object[F]): F -> F = {
         type Transformation[A <: SKind] = Morphism[DKind, DOb, DArr, F[A], F[A]]
