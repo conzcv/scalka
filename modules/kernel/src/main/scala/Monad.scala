@@ -9,6 +9,10 @@ trait Monad[
   F[A <: K] <: K
 ] extends Endofunctor[K, Ob, Arr, F] {
 
+  type From[G[A <: K] <: K, A <: K] = Morphism[K, Ob, Arr, G[A], F[A]]
+  type Pure[A <: K] = From[IdK[K], A]
+  type Flatten[A <: K] = From[F o F, A]
+  
   type Transform[F[A <: K] <: K, G[A <: K] <: K] = EndoNat[K, Ob, Arr, F, G]
   type o[F[A <: K] <: K, G[A <: K] <: K] = [A <: K] =>> F[F[A]]
 

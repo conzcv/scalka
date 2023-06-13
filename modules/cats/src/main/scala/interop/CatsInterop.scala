@@ -2,7 +2,8 @@ package scalka.interop.cats
 
 import cats.arrow.Category
 import cats.~>
-import cats.arrow.FunctionK
+import cats.arrow.{FunctionK => CatsFunctionK}
+import scalka.kernel.FunctionK
 import cats.{Functor, Monad => CatsMonad}
 import scalka.kernel.{Cat, Morphism, Endofunctor, Monad}
 import scalka.kernel.types._
@@ -16,7 +17,7 @@ given Cat[AnyK, ScalK, ~>] = new Cat[AnyK, ScalK, ~>] {
     Morphism(g.domain, f.arrow compose g.arrow, f.codomain)
 
   def id[F[_]](ob: ScalK[F]): F -> F =
-    Morphism(ob, FunctionK.id[F], ob)
+    Morphism(ob, CatsFunctionK.id[F], ob)
 }
 
 given [Arr[_, _]: Category]: Cat[Any, Scal, Arr] = new Cat[Any, Scal, Arr]  {
@@ -24,6 +25,14 @@ given [Arr[_, _]: Category]: Cat[Any, Scal, Arr] = new Cat[Any, Scal, Arr]  {
     Morphism(g.domain, g.arrow >>> f.arrow, f.codomain)
   def id[A](ob: Scal[A]): A -> A = Morphism(ob, Category[Arr].id[A], ob)
 }
+
+def cats2scalkaFunctionK[F[_], G[_]](f: CatsFunctionK[F, G]): FunctionK[Any, F, G] =
+  functionK[Any, F, G](fa => f(fa))
+
+def scalka2catsFunctionK[F[_], G[_]](f: FunctionK[Any, F, G]): CatsFunctionK[F, G] =
+  new CatsFunctionK[F, G] {
+    def apply[A](fa: F[A]): G[A] = f(fa)
+  }
 
 given [F[_]: Functor]: Endofunctor[Any, Scal, Function, F] =
   new Endofunctor[Any, Scal, Function, F] {
@@ -33,19 +42,12 @@ given [F[_]: Functor]: Endofunctor[Any, Scal, Function, F] =
 
 given [F[_]: CatsMonad]: Monad[Any, Scal, Function, F] =
   new Monad[Any, Scal, Function, F] {
-    type Pure[A] = Morphism[Any, Scal, Function, A, F[A]]
-    type Flatten[A] = Morphism[Any, Scal, Function, (F o F)[A], F[A]]
-
     val category: Cat[Any, Scal, Function] = summon
     val pure: Transform[IdK[Any], F] =
-      val funK = functionK[Any, Scal, Pure](_ => Morphism(summon, CatsMonad[F].pure, summon))
-      Nat(funK)
+      Nat(functionK[Any, Scal, Pure](_ => Morphism(summon, CatsMonad[F].pure, summon)))
     
-    val flatten: Transform[F o F, F] = new Transform[F o F, F] {
-      def apply[A](ob: Scal[A]): (F o F)[A] ~> F[A] =
-        val arrow: (F o F)[A] => F[A] = CatsMonad[F].flatten[A]
-        arrow.toMorphism[Scal](summon, summon)
-    }
+    val flatten: Transform[F o F, F] =
+      Nat(functionK[Any, Scal, Flatten](_ => Morphism(summon, CatsMonad[F].flatten, summon)))
 
     def fmap[A, B](f: A -> B): F[A] -> F[B] =
       val arrow: F[A] => F[B] = CatsMonad[F].map(_)(f.arrow)
