@@ -13,7 +13,6 @@ trait Monad[
   type Pure[A <: K] = From[IdK[K], A]
   type Flatten[A <: K] = From[F o F, A]
   
-  type Transform[F[A <: K] <: K, G[A <: K] <: K] = EndoNat[K, Ob, Arr, F, G]
   type o[F[A <: K] <: K, G[A <: K] <: K] = [A <: K] =>> F[F[A]]
 
   given category: Cat[K, Ob, Arr]
