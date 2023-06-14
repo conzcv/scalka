@@ -11,6 +11,10 @@ import cats.syntax.compose._
 import scalka.kernel.Nat
 import scalka.syntax.functionK.function2K
 import scalka.kernel.Fun
+import scalka.kernel.Traverse
+import cats.{Traverse => CatsTraverse}
+import cats.Applicative
+
 
 
 given ScalCategory2K[~>] = new SimpleCategory[Any2K, Scal2K, ~>] {
@@ -59,5 +63,13 @@ given [F[_]: CatsMonad]: ScalMonad1K[F] =
 
     def fmap[A, B](f: A -> B): F[A] -> F[B] =
       val arrow: F[A] => F[B] = CatsMonad[F].map(_)(f.arrow)
+      Morphism.fromArrow(arrow)
+  }
+
+given [L[_]: CatsTraverse, G[_]: Applicative]: ScalTraverse1K[L, G] =
+  new ScalTraverse1K[L, G] {
+    def fmap[A, B](f: A -> B): L[A] -> L[B] =
+      val function = (la: L[A]) => CatsTraverse[L].traverse(la)(f.arrow.arrow)
+      val arrow: ScalKleisli1K[G, L[A], L[B]] = Morphism.fromArrow(function)
       Morphism.fromArrow(arrow)
   }

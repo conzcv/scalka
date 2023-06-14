@@ -4,6 +4,7 @@ import scalka.interop.cats.given
 import scalka.interop.cats.forgetScalkaFunctorK
 import scalka.kernel.Morphism
 import scalka.syntax.functionK.function2K
+import scalka.kernel.Traverse
 
 
 class CatsSuite extends munit.FunSuite {
@@ -11,6 +12,7 @@ class CatsSuite extends munit.FunSuite {
     summon[ScalEndofunctor1K[Function[Int, _]]]
     summon[ScalMonad1K[List]]
     summon[KleisliCat[Any, Scal, Function, List]]
+    summon[ScalTraverse1K[List, Option]]
 
 
     val morphism: List --> Option =

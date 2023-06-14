@@ -16,6 +16,7 @@ package object types {
   type ScalEndofunctor1K[F[_]] = Endofunctor[Any, Scal, Function, F]
   type ScalMonad1K[F[_]] = Monad[Any, Scal, Function, F]
   type ScalKleisli1K[F[_], A, B] = Kleisli[Any, Scal, Function, F, A, B]
+  type ScalTraverse1K[L[_], G[_]] = Traverse[Any, Scal, Function, L, G]
 
 
   type IdK[K <: AnyKind] = [A <: K] =>> A
