@@ -7,9 +7,9 @@ final case class Morphism[
   A <: Kind, B <: Kind
 ](domain: Ob[A], arrow: Arr[A, B], codomain: Ob[B])
 
-extension [K <: AnyKind, ->[A <: K, B <: K], A <: K, B <: K](arr: A -> B) {
-  def toMorphism[Ob[A <: K]](domain: Ob[A], codomain: Ob[B]): Morphism[K, Ob, ->, A, B] =
-    Morphism[K, Ob, ->, A, B](domain, arr, codomain)
+object Morphism {
+  def fromArrow[K <: AnyKind, Ob[A <: K], Arr[A <: K, B <: K], A <: K, B <: K](arr: Arr[A, B])(using Ob[A], Ob[B]): Morphism[K, Ob, Arr, A, B] =
+    Morphism(summon, arr, summon)
 }
 
 extension [K <: AnyKind, Ob[A <: K], ->[A <: K, B <: K], A <: K, B <: K](mor: Morphism[K, Ob, ->, A, B]) {

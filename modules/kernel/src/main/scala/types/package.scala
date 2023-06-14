@@ -1,19 +1,38 @@
 package scalka.kernel
 
 package object types {
-  type Id[+A] = A
-  type IdK[K <: AnyKind] = [A <: K] =>> A
-  type AnyK = [A] =>> Any
-
   sealed trait Scal[A]
   object Scal:
     private val impl = new Scal[Any] {}
     given [A]: Scal[A] = impl.asInstanceOf[Scal[A]]
 
-  sealed trait ScalK[F[_]]
+  sealed trait ScalK[K <: AnyKind, F[A <: K]]
   object ScalK:
-    private val impl = new ScalK[AnyK] {}
-    given [F[_]]: ScalK[F] = impl.asInstanceOf[ScalK[F]]
+    private val impl = new ScalK[AnyKind, AnyK[AnyKind]] {}
+    given [K <: AnyKind, F[A <: K]]: ScalK[K, F] = impl.asInstanceOf[ScalK[K, F]]
+
+  type Id[+A] = A
+  type ScalCategory1K[Arr[_, _]] = Cat[Any, Scal, Arr]
+  type ScalEndofunctor1K[F[_]] = Endofunctor[Any, Scal, Function, F]
+  type ScalMonad1K[F[_]] = Monad[Any, Scal, Function, F]
+
+
+  type IdK[K <: AnyKind] = [A <: K] =>> A
+  type AnyK[K <: AnyKind] = [A <: K] =>> Any
+  type ScalKCons[K <: AnyKind] = [F[A <: K]] =>> ScalK[K, F]
+  type FunctionKCons[K <: AnyKind] = [F[A <: K], G[B <: K]] =>> FunctionK[K, F, G]
+  type CatK[K <: AnyKind] = Cat[AnyK[K], ScalKCons[K], FunctionKCons[K]]
+
+
+  type Any2K[A] = AnyK[Any][A]
+  type Scal2K[F[_]] = ScalK[Any, F]
+  type Function2K[F[_], G[_]] = FunctionK[Any, F, G]
+  type ScalCategory2K[F[_[_], _[_]]] = Cat[Any2K, Scal2K, F]
+  type ScalEndofunctor2K[F[G[_]] <: [A] =>> Any] = Endofunctor[Any2K, Scal2K, Function2K, F]
+  type ScalMonad2K[F[G[_]] <: [A] =>> Any] = Monad[Any2K, Scal2K, Function2K, F]
+
+  type ==>[A, B] = Morphism[Any, Scal, Function, A, B]
+  type -->[F[_], G[_]] = Morphism[Any2K, Scal2K, Function2K, F, G]
 
   type FunctorCat[
     SKind <: AnyKind, SOb[A <: SKind], SArr[A <: SKind, B <: SKind],
