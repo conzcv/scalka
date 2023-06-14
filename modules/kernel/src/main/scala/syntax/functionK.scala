@@ -17,4 +17,6 @@ object functionK {
   }
 
   def functionK[K <: AnyKind, F[A <: K], G[A <: K]] = new Applied[K, F, G](true)
+
+  def function2K[F[_], G[_]] = functionK[Any, F, G]
 }
