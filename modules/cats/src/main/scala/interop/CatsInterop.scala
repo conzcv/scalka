@@ -15,8 +15,6 @@ import scalka.kernel.Traverse
 import cats.{Traverse => CatsTraverse}
 import cats.Applicative
 
-
-
 given ScalCategory2K[~>] = new SimpleCategory[Any2K, Scal2K, ~>] {
   def composeArrows[F[_], G[_], H[_]](f: CatsFunctionK[G, H], g: CatsFunctionK[F, G]): CatsFunctionK[F, H] =
     f compose g
@@ -49,7 +47,7 @@ def scalka2catsFunctionK[F[_], G[_]](f: FunctionK[Any, F, G]): CatsFunctionK[F, 
 given [F[_]: Functor]: ScalEndofunctor1K[F] =
   new ScalEndofunctor1K[F] {
     def fmap[A, B](f: A -> B): F[A] ~> F[B] =
-      Morphism(summon, Functor[F].fmap(_)(f.arrow), summon)
+      Morphism.fromArrow(Functor[F].fmap(_)(f.arrow))
   }
 
 given [F[_]: CatsMonad]: ScalMonad1K[F] =

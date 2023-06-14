@@ -6,7 +6,6 @@ import scalka.kernel.Morphism
 import scalka.syntax.functionK.function2K
 import scalka.kernel.Traverse
 
-
 class CatsSuite extends munit.FunSuite {
   test("cats interop suite") {
     summon[ScalEndofunctor1K[Function[Int, _]]]
