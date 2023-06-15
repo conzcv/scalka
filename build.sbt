@@ -7,7 +7,7 @@ lazy val modules = file("modules")
 lazy val defaultSettings = Seq(
   version := "0.1.0-SNAPSHOT",
   scalaVersion := scala3Version,
-  scalacOptions ++= Seq("-Ykind-projector:underscores"),
+  scalacOptions ++= Seq("-Ykind-projector:underscores", "-Wunused:all"),
   libraryDependencies += "org.scalameta" %% "munit" % "0.7.29" % Test
 )
 

@@ -1,6 +1,5 @@
 package scalka.kernel
 
-import scalka.kernel.Morphism
 import scalka.kernel.types.{IdK, Scal, ScalEndofunctor1K, ScalAdjunction1K}
 import scalka.syntax.functionK.functionK
 

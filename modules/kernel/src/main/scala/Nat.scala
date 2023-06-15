@@ -1,7 +1,5 @@
 package scalka.kernel
 
-import scalka.syntax.functionK._
-
 trait Nat[
   SKind <: AnyKind,
   SOb[A <: SKind],

@@ -1,4 +1,4 @@
-import scalka.kernel.{Endofunctor, Monad}
+import scalka.kernel.Monad
 import scalka.kernel.types._
 import scalka.interop.cats.given
 import scalka.interop.cats.forgetScalkaFunctorK

@@ -1,15 +1,16 @@
 package scalka.interop.cats
 
-import cats.arrow.{Category => CatsCategory}
-import cats.~>
-import cats.arrow.{FunctionK => CatsFunctionK}
-import cats.{Functor => CatsFunctor, Monad => CatsMonad}
-import scalka.kernel.types._
-import cats.syntax.compose._
-import scalka.syntax.functionK.function2K
-import scalka.kernel._
-import cats.{Traverse => CatsTraverse}
 import cats.Applicative
+import cats.arrow.{Category => CatsCategory}
+import cats.arrow.{FunctionK => CatsFunctionK}
+import cats.syntax.compose._
+import cats.{Functor => CatsFunctor}
+import cats.{Monad => CatsMonad}
+import cats.{Traverse => CatsTraverse}
+import cats.~>
+import scalka.kernel._
+import scalka.kernel.types._
+import scalka.syntax.functionK.function2K
 
 given ScalCategory2K[~>] = new SimpleCategory[Any2K, Scal2K, ~>] {
   def composeRelations[F[_], G[_], H[_]](f: CatsFunctionK[G, H], g: CatsFunctionK[F, G]): CatsFunctionK[F, H] =
