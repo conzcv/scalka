@@ -1,10 +1,10 @@
-import scalka.kernel.Monad
-import scalka.kernel.types._
-import scalka.interop.cats.given
 import scalka.interop.cats.forgetScalkaFunctorK
+import scalka.interop.cats.given
+import scalka.kernel.Monad
 import scalka.kernel.Morphism
-import scalka.syntax.functionK.function2K
 import scalka.kernel.Traverse
+import scalka.kernel.types._
+import scalka.syntax.functionK.function2K
 
 class CatsSuite extends munit.FunSuite {
   test("cats interop suite") {

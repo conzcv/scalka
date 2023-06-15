@@ -12,6 +12,6 @@ trait FlatMap[
 
   val flatten: Transform[F o F, F]
 
-  final def flatMap[A <: K, B <: K](ob: Ob[B])(f: A -> F[B]): F[A] -> F[B] =
-    fmap(f) >> flatten(ob)
+  final def flatMap[A <: K, B <: K: Ob](f: A -> F[B]): F[A] -> F[B] =
+    fmap(f) >> flatten[B]
 }

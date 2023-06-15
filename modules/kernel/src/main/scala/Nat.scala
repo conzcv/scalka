@@ -12,7 +12,7 @@ trait Nat[
   G[A <: SKind] <: DKind
 ] {
   type ~>[A <: DKind, B <: DKind] = Morphism[DKind, DOb, DRel, A, B]
-  def apply[A <: SKind](ob: SOb[A]): F[A] ~> G[A]
+  def apply[A <: SKind: SOb]: F[A] ~> G[A]
 }
 
 object Nat {
@@ -28,6 +28,6 @@ object Nat {
     G[A <: SKind] <: DKind
   ](f: FunctionK[SKind, SOb, [A <: SKind] =>> Morphism[DKind, DOb, DRel, F[A], G[A]]]) =
     new Nat[SKind, SOb, DKind, DOb, DRel, F, G] {
-      def apply[A <: SKind](ob: SOb[A]): F[A] ~> G[A] = f(ob)
+      def apply[A <: SKind: SOb]: F[A] ~> G[A] = f(summon)
     }
 }

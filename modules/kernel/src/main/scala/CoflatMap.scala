@@ -12,6 +12,6 @@ trait CoflatMap[
 
   val coflatten: Transform[F, F o F]
 
-  final def coflatMap[A <: K, B <: K](ob: Ob[A])(f: F[A] -> B): F[A] -> F[B] =
-    coflatten(ob) >> fmap(f)
+  final def coflatMap[A <: K: Ob, B <: K](f: F[A] -> B): F[A] -> F[B] =
+    coflatten[A] >> fmap(f)
 }

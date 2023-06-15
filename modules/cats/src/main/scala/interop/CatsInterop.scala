@@ -16,7 +16,7 @@ given ScalCategory2K[~>] = new SimpleCategory[Any2K, Scal2K, ~>] {
   def composeRelations[F[_], G[_], H[_]](f: CatsFunctionK[G, H], g: CatsFunctionK[F, G]): CatsFunctionK[F, H] =
     f compose g
 
-  def idRelation[F[_]](ob: Object[F]): CatsFunctionK[F, F] = CatsFunctionK.id[F]
+  def idRelation[F[_]: Scal2K]: CatsFunctionK[F, F] = CatsFunctionK.id[F]
 }
 
 def forgetScalkaFunctorK: Functor[Any2K, Scal2K, Function2K, Any2K, Scal2K, CatsFunctionK, [F[A]] =>> F] =
@@ -30,7 +30,7 @@ given [Arr[_, _]: CatsCategory]: ScalCategory1K[Arr] = new SimpleCategory[Any, S
 
   def composeRelations[A, B, C](f: Arr[B, C], g: Arr[A, B]): Arr[A, C] =
     g >>> f
-  def idRelation[A](ob: Object[A]): Arr[A, A] = CatsCategory[Arr].id[A]
+  def idRelation[A: Scal]: Arr[A, A] = CatsCategory[Arr].id[A]
 }
 
 def cats2scalkaFunctionK[F[_], G[_]](f: CatsFunctionK[F, G]): FunctionK[Any, F, G] =

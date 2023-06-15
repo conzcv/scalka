@@ -21,16 +21,16 @@ trait Adjunction[
   val R: Functor[S, SOb, SRel, D, DOb, DRel, R]
   val L: Functor[D, DOb, DRel, S, SOb, SRel, L]
 
-  def left[A <: D, B <: S](ob: DOb[A])(f: L[A] ->> B): A ~>> R[B]
-  def right[A <: D, B <: S](ob: SOb[B])(f: A ~>> R[B]): L[A] ->> B
+  def left[A <: D: DOb, B <: S](f: L[A] ->> B): A ~>> R[B]
+  def right[A <: D, B <: S: SOb](f: A ~>> R[B]): L[A] ->> B
   
 
   def unit: Nat[D, DOb, D, DOb, DRel, IdK[D], RL] =
-    val funk = functionK[D, DOb, Unit](ob => left(ob)(L.fmap(D.id(ob))))
+    val funk = functionK[D, DOb, Unit](ob => left(L.fmap(D.id(ob)))(ob))
     Nat[D, DOb, D, DOb, DRel, IdK[D], RL](funk)
 
   def counit: Nat[S, SOb, S, SOb, SRel, LR, IdK[S]] =
-    val funk = functionK[S, SOb, Counit](ob => right(ob)(R.fmap(S.id(ob))))
+    val funk = functionK[S, SOb, Counit](ob => right(R.fmap(S.id(ob)))(ob))
     Nat[S, SOb, S, SOb, SRel, LR, IdK[S]](funk)
 
   def monad: Monad[D, DOb, DRel, RL] =
@@ -40,9 +40,9 @@ trait Adjunction[
 
       val flatten: Transform[[A <: D] =>> RL[RL[A]], RL] =
         new Transform[[A <: D] =>> RL[RL[A]], RL] {
-          def apply[A <: D](ob: DOb[A]): RL[RL[A]] ~> RL[A] =
-            val id = D.id(ob)
-            R.fmap(right(L.fmap(id).domain)(fmap(id)))
+          def apply[A <: D: DOb]: RL[RL[A]] ~> RL[A] =
+            val id = D.id[A]
+            R.fmap(right(fmap(id))(L.fmap(id).domain))
         }
 
       def fmap[A <: D, B <: D](f: A ~>> B): RL[A] ~>> RL[B] =
@@ -56,9 +56,9 @@ trait Adjunction[
 
       val coflatten: Transform[LR, [A <: S] =>> LR[LR[A]]] =
         new Transform[LR, [A <: S] =>> LR[LR[A]]]  {
-          def apply[A <: S](ob: SOb[A]): LR[A] ~> LR[LR[A]] =
-            val id = S.id(ob)
-            L.fmap(left(R.fmap(id).codomain)(fmap(id)))
+          def apply[A <: S: SOb]: LR[A] ~> LR[LR[A]] =
+            val id = S.id[A]
+            L.fmap(left(fmap(id))(R.fmap(id).codomain))
         }
 
       def fmap[A <: S, B <: S](f: A ->> B): L[R[A]] ->> L[R[B]] =
@@ -69,9 +69,9 @@ trait Adjunction[
 object Adjunction {
   given [X]: ScalAdjunction1K[X => _, (X, _)] =
     new ScalAdjunction1K[X => _, (X, _)] {
-      def left[A, B](ob: Scal[A])(f: (X, A) ->> B): A ~>> (X => B) =
+      def left[A: Scal, B](f: (X, A) ->> B): A ~>> (X => B) =
         Morphism.fromRelation(a => f.arrow(_, a))
-      def right[A, B](ob: Scal[B])(f: A ~>> (X => B)): (X, A) ->> B =
+      def right[A, B: Scal](f: A ~>> (X => B)): (X, A) ->> B =
         Morphism.fromRelation((x, a) => f.arrow(a)(x))
       val S = summon
       val D = summon
