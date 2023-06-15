@@ -28,7 +28,7 @@ object HomFunctor {
   def apply[
     K <: AnyKind, Ob[A <: K], Rel[A <: K, B <: K],
     R <: K
-  ](using  C: Cat[K, Ob, Rel]): HomFunctor[K, Ob, Rel, R] = new HomFunctor[K, Ob, Rel, R] {
+  ](using  C: Category[K, Ob, Rel]): HomFunctor[K, Ob, Rel, R] = new HomFunctor[K, Ob, Rel, R] {
     def fmap[A <: K, B <: K](f: A -> B): (R -> A) ~> (R -> B) =
       val arrow: (R -> A) => (R -> B) = _ >> f
       Morphism.fromArrow(arrow)

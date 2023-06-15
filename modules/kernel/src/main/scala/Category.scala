@@ -3,9 +3,9 @@ package scalka.kernel
 import scalka.kernel.types._
 import scalka.syntax.functionK._
 
-trait Cat[Kind <: AnyKind, Ob[A <: Kind], Rel[A <: Kind, B <: Kind]] {
+trait Category[Kind <: AnyKind, Ob[A <: Kind], Rel[A <: Kind, B <: Kind]] {
   type Object[A <: Kind] = Ob[A]
-  type Arrow[A <: Kind, B <: Kind] = Rel[A, B]
+  type Relation[A <: Kind, B <: Kind] = Rel[A, B]
   type ->[A <: Kind, B <: Kind] = Morphism[Kind, Ob, Rel, A, B]
 
   def idRelation[A <: Kind](ob: Object[A]): Rel[A, A]
@@ -15,10 +15,10 @@ trait Cat[Kind <: AnyKind, Ob[A <: Kind], Rel[A <: Kind, B <: Kind]] {
 }
 
 extension [Kind <: AnyKind, Ob[A <: Kind], A <: Kind](obj: Ob[A]) {
-  def id[Arr[A <: Kind, B <: Kind]](using C: Cat[Kind, Ob, Arr]) = C.id(obj)
+  def id[Arr[A <: Kind, B <: Kind]](using C: Category[Kind, Ob, Arr]) = C.id(obj)
 }
 
-trait SimpleCategory[K <: AnyKind, Ob[A <: K], Arr[A <: K, B <: K]] extends Cat[K, Ob, Arr] {
+trait SimpleCategory[K <: AnyKind, Ob[A <: K], Arr[A <: K, B <: K]] extends Category[K, Ob, Arr] {
   def composeRelations[A <: K, B <: K, C <: K](f: Arr[B, C], g: Arr[A, B]): Arr[A, C]
 
   final def compose[A <: K, B <: K, C <: K](f: B -> C, g: A -> B): A -> C =
@@ -34,13 +34,13 @@ sealed trait CatInstances {
         g andThen f
     }
 
-  given Cat[Any, Scal, Function] = new SimpleCategory[Any, Scal, Function] {
+  given Category[Any, Scal, Function] = new SimpleCategory[Any, Scal, Function] {
     def composeRelations[A, B, C](f: B => C, g: A => B): A => C =
       f compose g
     def idRelation[A](ob: Object[A]): A => A = identity
   }
 
-  given Cat[Any, Scal, <:<] = new SimpleCategory[Any, Scal, <:<] {
+  given Category[Any, Scal, <:<] = new SimpleCategory[Any, Scal, <:<] {
     def composeRelations[A, B, C](f: B <:< C, g: A <:< B): A <:< C =
       f compose g
 
@@ -50,7 +50,7 @@ sealed trait CatInstances {
   given [
     SKind <: AnyKind, SOb[A <: SKind], SRel[A <: SKind, B <: SKind],
     DKind <: AnyKind, DOb[A <: DKind], DRel[A <: DKind, B <: DKind]
-  ](using S: Cat[SKind, SOb, SRel], D: Cat[DKind, DOb, DRel]): FunctorCat[SKind, SOb, SRel, DKind, DOb, DRel] =
+  ](using S: Category[SKind, SOb, SRel], D: Category[DKind, DOb, DRel]): FunctorCat[SKind, SOb, SRel, DKind, DOb, DRel] =
     new SimpleCategory[
       [A <: SKind] =>> DKind,
       [F[A <: SKind] <: DKind] =>> Functor[SKind, SOb, SRel, DKind, DOb, DRel, F],
@@ -69,7 +69,7 @@ sealed trait CatInstances {
         Nat(functionK[SKind, SOb, Transformation](ob => obj.fmap(ob.id)))
     }
 
-  given [K <: AnyKind, Ob[A <: K], Rel[A <: K, B <: K], F[A <: K] <: K](using C: Cat[K, Ob, Rel], M: Monad[K, Ob, Rel, F]): KleisliCat[K, Ob, Rel, F] =
+  given [K <: AnyKind, Ob[A <: K], Rel[A <: K, B <: K], F[A <: K] <: K](using C: Category[K, Ob, Rel], M: Monad[K, Ob, Rel, F]): KleisliCat[K, Ob, Rel, F] =
     new KleisliCat[K, Ob, Rel, F] {
       def compose[A <: K, B <: K, C <: K](f: B -> C, g: A -> B): A -> C =
         val arrow = g.arrow >> M.flatMap(f.codomain)(f.arrow)
@@ -79,6 +79,6 @@ sealed trait CatInstances {
     }
 }
 
-object Cat extends CatInstances {
-  def apply[K <: AnyKind, Ob[A <: K], ->[A <: K, B <: K]](using C: Cat[K, Ob, ->]): Cat[K, Ob, ->] = C
+object Category extends CatInstances {
+  def apply[K <: AnyKind, Ob[A <: K], ->[A <: K, B <: K]](using C: Category[K, Ob, ->]): Category[K, Ob, ->] = C
 }

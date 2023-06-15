@@ -10,7 +10,7 @@ trait CoflatMap[
 ] extends Endofunctor[K, Ob, Rel, F] {
   type Coflatten[A <: K] = To[F o F, A]
 
-  given category: Cat[K, Ob, Rel]
+  given category: Category[K, Ob, Rel]
 
   val coflatten: Transform[F, F o F]
 

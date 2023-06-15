@@ -3,15 +3,11 @@ package scalka.interop.cats
 import cats.arrow.{Category => CatsCategory}
 import cats.~>
 import cats.arrow.{FunctionK => CatsFunctionK}
-import scalka.kernel.FunctionK
 import cats.{Functor => CatsFunctor, Monad => CatsMonad}
-import scalka.kernel.{Cat, Morphism, Endofunctor, Monad, SimpleCategory}
 import scalka.kernel.types._
 import cats.syntax.compose._
-import scalka.kernel.Nat
 import scalka.syntax.functionK.function2K
-import scalka.kernel.Functor
-import scalka.kernel.Traverse
+import scalka.kernel._
 import cats.{Traverse => CatsTraverse}
 import cats.Applicative
 
@@ -52,7 +48,7 @@ given [F[_]: CatsFunctor]: ScalEndofunctor1K[F] =
 
 given [F[_]: CatsMonad]: ScalMonad1K[F] =
   new ScalMonad1K[F]{
-    val category: Cat[Any, Scal, Function] = summon
+    val category: Category[Any, Scal, Function] = summon
     val pure: Transform[IdK[Any], F] =
       Nat(function2K[Scal, Pure](_ => Morphism.fromArrow(CatsMonad[F].pure)))
     

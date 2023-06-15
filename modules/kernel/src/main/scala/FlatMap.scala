@@ -10,7 +10,7 @@ trait FlatMap[
 ] extends Endofunctor[K, Ob, Rel, F] {
   type Flatten[A <: K] = From[F o F, A]
   
-  given category: Cat[K, Ob, Rel]
+  given category: Category[K, Ob, Rel]
 
   val flatten: Transform[F o F, F]
 

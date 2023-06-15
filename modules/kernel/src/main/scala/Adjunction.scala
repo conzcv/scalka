@@ -16,8 +16,8 @@ trait Adjunction[
   type RL[A <: D] = R[L[A]]
   type LR[A <: S] = L[R[A]]
 
-  given S: Cat[S, SOb, SRel]
-  given D: Cat[D, DOb, DRel]
+  given S: Category[S, SOb, SRel]
+  given D: Category[D, DOb, DRel]
    
   val R: Functor[S, SOb, SRel, D, DOb, DRel, R]
   val L: Functor[D, DOb, DRel, S, SOb, SRel, L]
