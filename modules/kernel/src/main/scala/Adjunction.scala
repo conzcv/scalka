@@ -70,18 +70,18 @@ object Adjunction {
   given [X]: ScalAdjunction1K[X => _, (X, _)] =
     new ScalAdjunction1K[X => _, (X, _)] {
       def left[A: Scal, B](f: (X, A) ->> B): A ~>> (X => B) =
-        Morphism.fromRelation(a => f.arrow(_, a))
+        Morphism.fromRelation(a => f.relation(_, a))
       def right[A, B: Scal](f: A ~>> (X => B)): (X, A) ->> B =
-        Morphism.fromRelation((x, a) => f.arrow(a)(x))
+        Morphism.fromRelation((x, a) => f.relation(a)(x))
       val S = summon
       val D = summon
       val L = new ScalEndofunctor1K[(X, _)] {
         def fmap[A, B](f: A -> B): (X, A) ~> (X, B) =
-          Morphism.fromRelation((x, a) => (x, f.arrow(a)))
+          Morphism.fromRelation((x, a) => (x, f.relation(a)))
       }
       val R = new ScalEndofunctor1K[(X => _)] {
         def fmap[A, B](f: A -> B): (X => A) ~> (X => B) =
-          Morphism.fromRelation(xa => xa andThen f.arrow)
+          Morphism.fromRelation(xa => xa andThen f.relation)
       }
     }
 }

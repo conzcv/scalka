@@ -30,8 +30,8 @@ object HomCovariant {
     R <: K
   ](using  C: Category[K, Ob, Rel]): HomCovariant[K, Ob, Rel, R] = new HomCovariant[K, Ob, Rel, R] {
     def fmap[A <: K, B <: K](f: A -> B): (R -> A) ~> (R -> B) =
-      val arrow: (R -> A) => (R -> B) = _ >> f
-      Morphism.fromRelation(arrow)
+      val relation: (R -> A) => (R -> B) = _ >> f
+      Morphism.fromRelation(relation)
   }
 }
 
