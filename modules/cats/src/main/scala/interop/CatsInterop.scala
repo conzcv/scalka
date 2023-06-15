@@ -22,7 +22,7 @@ def forgetScalkaFunctorK: Functor[Any2K, Scal2K, Function2K, Any2K, Scal2K, Cats
   new Functor[Any2K, Scal2K, Function2K, Any2K, Scal2K, CatsFunctionK, [F[A]] =>> F] {
     def fmap[F[_], G[_]](f: Morphism[Any2K, Scal2K, Function2K, F, G]): F ~> G =
       val arrow = scalka2catsFunctionK(f.arrow)
-      Morphism.fromArrow(arrow)
+      Morphism.fromRelation(arrow)
   }
 
 given [Arr[_, _]: CatsCategory]: ScalCategory1K[Arr] = new SimpleCategory[Any, Scal, Arr]  {
@@ -43,27 +43,27 @@ def scalka2catsFunctionK[F[_], G[_]](f: FunctionK[Any, F, G]): CatsFunctionK[F, 
 given [F[_]: CatsFunctor]: ScalEndofunctor1K[F] =
   new ScalEndofunctor1K[F] {
     def fmap[A, B](f: A -> B): F[A] ~> F[B] =
-      Morphism.fromArrow(CatsFunctor[F].fmap(_)(f.arrow))
+      Morphism.fromRelation(CatsFunctor[F].fmap(_)(f.arrow))
   }
 
 given [F[_]: CatsMonad]: ScalMonad1K[F] =
   new ScalMonad1K[F]{
     val category: Category[Any, Scal, Function] = summon
     val pure: Transform[IdK[Any], F] =
-      Nat(function2K[Scal, Pure](_ => Morphism.fromArrow(CatsMonad[F].pure)))
+      Nat(function2K[Scal, Pure](_ => Morphism.fromRelation(CatsMonad[F].pure)))
     
     val flatten: Transform[F o F, F] =
-      Nat(function2K[Scal, Flatten](_ => Morphism.fromArrow(CatsMonad[F].flatten)))
+      Nat(function2K[Scal, Flatten](_ => Morphism.fromRelation(CatsMonad[F].flatten)))
 
     def fmap[A, B](f: A -> B): F[A] -> F[B] =
       val arrow: F[A] => F[B] = CatsMonad[F].map(_)(f.arrow)
-      Morphism.fromArrow(arrow)
+      Morphism.fromRelation(arrow)
   }
 
 given [L[_]: CatsTraverse, G[_]: Applicative]: ScalTraverse1K[L, G] =
   new ScalTraverse1K[L, G] {
     def fmap[A, B](f: A -> B): L[A] -> L[B] =
       val function = (la: L[A]) => CatsTraverse[L].traverse(la)(f.arrow.arrow)
-      val arrow: ScalKleisli1K[G, L[A], L[B]] = Morphism.fromArrow(function)
-      Morphism.fromArrow(arrow)
+      val arrow: ScalKleisli1K[G, L[A], L[B]] = Morphism.fromRelation(function)
+      Morphism.fromRelation(arrow)
   }

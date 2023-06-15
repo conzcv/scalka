@@ -16,7 +16,7 @@ class CatsSuite extends munit.FunSuite {
 
     val morphism: List --> Option =
        val funK = function2K[List, Option](_.headOption)
-       Morphism.fromArrow(funK)
+       Morphism.fromRelation(funK)
 
     val result = forgetScalkaFunctorK.fmap(morphism).arrow(List(1678,2,3,4,5,6))
 

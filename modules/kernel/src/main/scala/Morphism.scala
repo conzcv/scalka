@@ -10,6 +10,6 @@ final case class Morphism[
 }
 
 object Morphism {
-  def fromArrow[K <: AnyKind, Ob[A <: K], Rel[A <: K, B <: K], A <: K, B <: K](arr: Rel[A, B])(using Ob[A], Ob[B]): Morphism[K, Ob, Rel, A, B] =
+  def fromRelation[K <: AnyKind, Ob[A <: K], Rel[A <: K, B <: K], A <: K, B <: K](arr: Rel[A, B])(using Ob[A], Ob[B]): Morphism[K, Ob, Rel, A, B] =
     Morphism(summon, arr, summon)
 }

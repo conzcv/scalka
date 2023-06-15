@@ -1,7 +1,7 @@
 package scalka.kernel
 
 import scalka.kernel.Morphism
-import scalka.kernel.types.IdK
+import scalka.kernel.types.{IdK, Scal, ScalEndofunctor1K, ScalAdjunction1K}
 import scalka.syntax.functionK.functionK
 
 trait Adjunction[
@@ -16,22 +16,22 @@ trait Adjunction[
   type RL[A <: D] = R[L[A]]
   type LR[A <: S] = L[R[A]]
 
-  given S: Category[S, SOb, SRel]
-  given D: Category[D, DOb, DRel]
+  val S: Category[S, SOb, SRel]
+  val D: Category[D, DOb, DRel]
    
   val R: Functor[S, SOb, SRel, D, DOb, DRel, R]
   val L: Functor[D, DOb, DRel, S, SOb, SRel, L]
 
-  def right[A <: D, B <: S](ob: DOb[A])(f: L[A] ->> B): A ~>> R[B]
-  def left[A <: D, B <: S](ob: SOb[B])(f: A ~>> R[B]): L[A] ->> B
+  def left[A <: D, B <: S](ob: DOb[A])(f: L[A] ->> B): A ~>> R[B]
+  def right[A <: D, B <: S](ob: SOb[B])(f: A ~>> R[B]): L[A] ->> B
   
 
   def unit: Nat[D, DOb, D, DOb, DRel, IdK[D], RL] =
-    val funk = functionK[D, DOb, Unit](ob => right(ob)(L.fmap(ob.id[DRel])))
+    val funk = functionK[D, DOb, Unit](ob => left(ob)(L.fmap(D.id(ob))))
     Nat[D, DOb, D, DOb, DRel, IdK[D], RL](funk)
 
   def counit: Nat[S, SOb, S, SOb, SRel, LR, IdK[S]] =
-    val funk = functionK[S, SOb, Counit](ob => left(ob)(R.fmap(ob.id[SRel])))
+    val funk = functionK[S, SOb, Counit](ob => right(ob)(R.fmap(S.id(ob))))
     Nat[S, SOb, S, SOb, SRel, LR, IdK[S]](funk)
 
   def monad: Monad[D, DOb, DRel, RL] =
@@ -42,8 +42,8 @@ trait Adjunction[
       val flatten: Transform[[A <: D] =>> RL[RL[A]], RL] =
         new Transform[[A <: D] =>> RL[RL[A]], RL] {
           def apply[A <: D](ob: DOb[A]): RL[RL[A]] ~> RL[A] =
-            val id = ob.id[DRel]
-            R.fmap(left(L.fmap(id).domain)(fmap(id)))
+            val id = D.id(ob)
+            R.fmap(right(L.fmap(id).domain)(fmap(id)))
         }
 
       def fmap[A <: D, B <: D](f: A ~>> B): RL[A] ~>> RL[B] =
@@ -58,11 +58,31 @@ trait Adjunction[
       val coflatten: Transform[LR, [A <: S] =>> LR[LR[A]]] =
         new Transform[LR, [A <: S] =>> LR[LR[A]]]  {
           def apply[A <: S](ob: SOb[A]): LR[A] ~> LR[LR[A]] =
-            val id = ob.id[SRel]
-            L.fmap(right(R.fmap(id).codomain)(fmap(id)))
+            val id = S.id(ob)
+            L.fmap(left(R.fmap(id).codomain)(fmap(id)))
         }
 
       def fmap[A <: S, B <: S](f: A ->> B): L[R[A]] ->> L[R[B]] =
         L.fmap(R.fmap(f))
+    }
+}
+
+object Adjunction {
+  given [X]: ScalAdjunction1K[X => _, (X, _)] =
+    new ScalAdjunction1K[X => _, (X, _)] {
+      def left[A, B](ob: Scal[A])(f: (X, A) ->> B): A ~>> (X => B) =
+        Morphism.fromRelation(a => f.arrow(_, a))
+      def right[A, B](ob: Scal[B])(f: A ~>> (X => B)): (X, A) ->> B =
+        Morphism.fromRelation((x, a) => f.arrow(a)(x))
+      val S = summon
+      val D = summon
+      val L = new ScalEndofunctor1K[(X, _)] {
+        def fmap[A, B](f: A -> B): (X, A) ~> (X, B) =
+          Morphism.fromRelation((x, a) => (x, f.arrow(a)))
+      }
+      val R = new ScalEndofunctor1K[(X => _)] {
+        def fmap[A, B](f: A -> B): (X => A) ~> (X => B) =
+          Morphism.fromRelation(xa => xa andThen f.arrow)
+      }
     }
 }

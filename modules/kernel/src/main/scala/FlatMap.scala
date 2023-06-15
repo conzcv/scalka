@@ -1,7 +1,5 @@
 package scalka.kernel
 
-import scalka.syntax.functionK.functionK
-
 trait FlatMap[
   K <: AnyKind,
   Ob[A <: K],

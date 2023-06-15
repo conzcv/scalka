@@ -19,19 +19,19 @@ trait Functor[
   def fmap[A <: SKind, B <: SKind](f: A -> B): F[A] ~> F[B]
 }
 
-sealed trait HomFunctor[
+sealed trait HomCovariant[
   K <: AnyKind, Ob[A <: K], Rel[A <: K, B <: K],
   R <: K
 ] extends Functor[K, Ob, Rel, Any, Scal, Function, [B <: K] =>> Morphism[K, Ob, Rel, R, B]]
 
-object HomFunctor {
+object HomCovariant {
   def apply[
     K <: AnyKind, Ob[A <: K], Rel[A <: K, B <: K],
     R <: K
-  ](using  C: Category[K, Ob, Rel]): HomFunctor[K, Ob, Rel, R] = new HomFunctor[K, Ob, Rel, R] {
+  ](using  C: Category[K, Ob, Rel]): HomCovariant[K, Ob, Rel, R] = new HomCovariant[K, Ob, Rel, R] {
     def fmap[A <: K, B <: K](f: A -> B): (R -> A) ~> (R -> B) =
       val arrow: (R -> A) => (R -> B) = _ >> f
-      Morphism.fromArrow(arrow)
+      Morphism.fromRelation(arrow)
   }
 }
 
