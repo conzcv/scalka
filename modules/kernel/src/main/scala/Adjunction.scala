@@ -22,16 +22,16 @@ trait Adjunction[
   val R: Fun[S, SOb, SArr, D, DOb, DArr, R]
   val L: Fun[D, DOb, DArr, S, SOb, SArr, L]
 
-  def right[A <: D, B <: S](f: L[A] ->> B): A ~>> R[B]
-  def left[A <: D, B <: S](f: A ~>> R[B]): L[A] ->> B
+  def right[A <: D, B <: S](ob: DOb[A])(f: L[A] ->> B): A ~>> R[B]
+  def left[A <: D, B <: S](ob: SOb[B])(f: A ~>> R[B]): L[A] ->> B
   
 
   def unit: Nat[D, DOb, D, DOb, DArr, IdK[D], RL] =
-    val funk = functionK[D, DOb, Unit](ob => right(L.fmap(ob.id[DArr])))
+    val funk = functionK[D, DOb, Unit](ob => right(ob)(L.fmap(ob.id[DArr])))
     Nat[D, DOb, D, DOb, DArr, IdK[D], RL](funk)
 
   def counit: Nat[S, SOb, S, SOb, SArr, LR, IdK[S]] =
-    val funk = functionK[S, SOb, Counit](ob => left(R.fmap(ob.id[SArr])))
+    val funk = functionK[S, SOb, Counit](ob => left(ob)(R.fmap(ob.id[SArr])))
     Nat[S, SOb, S, SOb, SArr, LR, IdK[S]](funk)
 
   def monad: Monad[D, DOb, DArr, RL] =
