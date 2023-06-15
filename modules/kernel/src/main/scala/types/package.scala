@@ -45,7 +45,7 @@ package object types {
     DKind <: AnyKind, DOb[A <: DKind], DArr[A <: DKind, B <: DKind]
   ] = Cat[
     [A <: SKind] =>> DKind,
-    [F[A <: SKind] <: DKind] =>> Fun[SKind, SOb, SArr, DKind, DOb, DArr, F],
+    [F[A <: SKind] <: DKind] =>> Functor[SKind, SOb, SArr, DKind, DOb, DArr, F],
     [F[A <: SKind] <: DKind, G[A <: SKind] <: DKind] =>> Nat[SKind, SOb, DKind, DOb, DArr, F, G]
   ]
 

@@ -1,5 +1,7 @@
 package scalka.kernel
 
+import scalka.syntax.functionK.functionK
+
 trait FunctionK[K <: AnyKind, F[A <: K], G[A <: K]] { self =>
   def apply[A <: K](fa: F[A]): G[A]
   def andThen[H[A <: K]](f: FunctionK[K, G, H]): FunctionK[K, F, H] = new FunctionK[K, F, H] {
@@ -8,7 +10,6 @@ trait FunctionK[K <: AnyKind, F[A <: K], G[A <: K]] { self =>
 }
 
 object FunctionK {
-  def id[K <: AnyKind, F[A <: K]]: FunctionK[K, F, F] = new FunctionK[K, F, F] {
-    def apply[A <: K](fa: F[A]): F[A] = fa
-  }
+  def id[K <: AnyKind, F[A <: K]]: FunctionK[K, F, F] =
+    functionK[K, F, F](fa => fa)
 }

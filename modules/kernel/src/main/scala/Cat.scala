@@ -53,7 +53,7 @@ sealed trait CatInstances {
   ](using S: Cat[SKind, SOb, SRel], D: Cat[DKind, DOb, DRel]): FunctorCat[SKind, SOb, SRel, DKind, DOb, DRel] =
     new SimpleCategory[
       [A <: SKind] =>> DKind,
-      [F[A <: SKind] <: DKind] =>> Fun[SKind, SOb, SRel, DKind, DOb, DRel, F],
+      [F[A <: SKind] <: DKind] =>> Functor[SKind, SOb, SRel, DKind, DOb, DRel, F],
       [F[A <: SKind] <: DKind, G[A <: SKind] <: DKind] =>> Nat[SKind, SOb, DKind, DOb, DRel, F, G]
     ] {
       def composeRelations[

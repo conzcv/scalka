@@ -19,8 +19,8 @@ trait Adjunction[
   given S: Cat[S, SOb, SRel]
   given D: Cat[D, DOb, DRel]
    
-  val R: Fun[S, SOb, SRel, D, DOb, DRel, R]
-  val L: Fun[D, DOb, DRel, S, SOb, SRel, L]
+  val R: Functor[S, SOb, SRel, D, DOb, DRel, R]
+  val L: Functor[D, DOb, DRel, S, SOb, SRel, L]
 
   def right[A <: D, B <: S](ob: DOb[A])(f: L[A] ->> B): A ~>> R[B]
   def left[A <: D, B <: S](ob: SOb[B])(f: A ~>> R[B]): L[A] ->> B

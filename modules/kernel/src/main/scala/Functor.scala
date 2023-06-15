@@ -2,7 +2,7 @@ package scalka.kernel
 
 import scalka.kernel.types._
 
-trait Fun[
+trait Functor[
   SKind <: AnyKind,
   SOb[A <: SKind],
   SRel[A <: SKind, B <: SKind],
@@ -22,7 +22,7 @@ trait Fun[
 sealed trait HomFunctor[
   K <: AnyKind, Ob[A <: K], Rel[A <: K, B <: K],
   R <: K
-] extends Fun[K, Ob, Rel, Any, Scal, Function, [B <: K] =>> Morphism[K, Ob, Rel, R, B]]
+] extends Functor[K, Ob, Rel, Any, Scal, Function, [B <: K] =>> Morphism[K, Ob, Rel, R, B]]
 
 object HomFunctor {
   def apply[
@@ -36,9 +36,9 @@ object HomFunctor {
 }
 
 sealed trait FunInstances {
-  val liftSubtyping = new Fun[Any, Scal, <:<, Any, Scal, Function, Id] {
+  val liftSubtyping = new Functor[Any, Scal, <:<, Any, Scal, Function, Id] {
     def fmap[A, B](f: A -> B): A ~> B = f.asInstanceOf[A ~> B]
   }
 }
 
-object Fun extends FunInstances
+object Functor extends FunInstances

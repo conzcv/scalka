@@ -1,16 +1,16 @@
 package scalka.interop.cats
 
-import cats.arrow.Category
+import cats.arrow.{Category => CatsCategory}
 import cats.~>
 import cats.arrow.{FunctionK => CatsFunctionK}
 import scalka.kernel.FunctionK
-import cats.{Functor, Monad => CatsMonad}
+import cats.{Functor => CatsFunctor, Monad => CatsMonad}
 import scalka.kernel.{Cat, Morphism, Endofunctor, Monad, SimpleCategory}
 import scalka.kernel.types._
 import cats.syntax.compose._
 import scalka.kernel.Nat
 import scalka.syntax.functionK.function2K
-import scalka.kernel.Fun
+import scalka.kernel.Functor
 import scalka.kernel.Traverse
 import cats.{Traverse => CatsTraverse}
 import cats.Applicative
@@ -22,18 +22,18 @@ given ScalCategory2K[~>] = new SimpleCategory[Any2K, Scal2K, ~>] {
   def idRelation[F[_]](ob: Object[F]): CatsFunctionK[F, F] = CatsFunctionK.id[F]
 }
 
-def forgetScalkaFunctorK: Fun[Any2K, Scal2K, Function2K, Any2K, Scal2K, CatsFunctionK, [F[A]] =>> F] =
-  new Fun[Any2K, Scal2K, Function2K, Any2K, Scal2K, CatsFunctionK, [F[A]] =>> F] {
+def forgetScalkaFunctorK: Functor[Any2K, Scal2K, Function2K, Any2K, Scal2K, CatsFunctionK, [F[A]] =>> F] =
+  new Functor[Any2K, Scal2K, Function2K, Any2K, Scal2K, CatsFunctionK, [F[A]] =>> F] {
     def fmap[F[_], G[_]](f: Morphism[Any2K, Scal2K, Function2K, F, G]): F ~> G =
       val arrow = scalka2catsFunctionK(f.arrow)
       Morphism.fromArrow(arrow)
   }
 
-given [Arr[_, _]: Category]: ScalCategory1K[Arr] = new SimpleCategory[Any, Scal, Arr]  {
+given [Arr[_, _]: CatsCategory]: ScalCategory1K[Arr] = new SimpleCategory[Any, Scal, Arr]  {
 
   def composeRelations[A, B, C](f: Arr[B, C], g: Arr[A, B]): Arr[A, C] =
     g >>> f
-  def idRelation[A](ob: Object[A]): Arr[A, A] = Category[Arr].id[A]
+  def idRelation[A](ob: Object[A]): Arr[A, A] = CatsCategory[Arr].id[A]
 }
 
 def cats2scalkaFunctionK[F[_], G[_]](f: CatsFunctionK[F, G]): FunctionK[Any, F, G] =
@@ -44,10 +44,10 @@ def scalka2catsFunctionK[F[_], G[_]](f: FunctionK[Any, F, G]): CatsFunctionK[F, 
     def apply[A](fa: F[A]): G[A] = f(fa)
   }
 
-given [F[_]: Functor]: ScalEndofunctor1K[F] =
+given [F[_]: CatsFunctor]: ScalEndofunctor1K[F] =
   new ScalEndofunctor1K[F] {
     def fmap[A, B](f: A -> B): F[A] ~> F[B] =
-      Morphism.fromArrow(Functor[F].fmap(_)(f.arrow))
+      Morphism.fromArrow(CatsFunctor[F].fmap(_)(f.arrow))
   }
 
 given [F[_]: CatsMonad]: ScalMonad1K[F] =
