@@ -13,7 +13,7 @@ trait Nat[
   F[A <: SKind] <: DKind,
   G[A <: SKind] <: DKind
 ] {
-  final type ~>[A <: DKind, B <: DKind] = Morphism[DKind, DOb, DArr, A, B]
+  type ~>[A <: DKind, B <: DKind] = Morphism[DKind, DOb, DArr, A, B]
   def apply[A <: SKind](ob: SOb[A]): F[A] ~> G[A]
 }
 

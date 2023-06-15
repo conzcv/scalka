@@ -1,5 +1,7 @@
 package scalka.kernel
 
+import scalka.syntax.functionK.functionK
+
 trait CoflatMap[
   K <: AnyKind,
   Ob[A <: K],
@@ -10,7 +12,9 @@ trait CoflatMap[
 
   given category: Cat[K, Ob, Arr]
 
-  val coflatten: Transform[F, F o F]
+  val coflatten: Transform[F, F o F] =
+    val fun = functionK[K, Ob, Coflatten](ob => coflatMap(ob)(fmap(ob.id[Arr])))
+    Nat(fun)
 
   final def coflatMap[A <: K, B <: K](ob: Ob[A])(f: F[A] -> B): F[A] -> F[B] =
     coflatten(ob) >> fmap(f)

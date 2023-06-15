@@ -4,8 +4,8 @@ import scalka.kernel.types._
 import scalka.syntax.functionK._
 
 trait Cat[Kind <: AnyKind, Ob[A <: Kind], Arr[A <: Kind, B <: Kind]] {
-  final type Object[A <: Kind] = Ob[A]
-  final type Arrow[A <: Kind, B <: Kind] = Arr[A, B]
+  type Object[A <: Kind] = Ob[A]
+  type Arrow[A <: Kind, B <: Kind] = Arr[A, B]
   type ->[A <: Kind, B <: Kind] = Morphism[Kind, Ob, Arr, A, B]
 
   def idArrow[A <: Kind](ob: Object[A]): Arr[A, A]
