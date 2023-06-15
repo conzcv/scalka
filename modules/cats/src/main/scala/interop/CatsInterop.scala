@@ -55,6 +55,9 @@ given [F[_]: CatsMonad]: ScalMonad1K[F] =
     val category: Cat[Any, Scal, Function] = summon
     val pure: Transform[IdK[Any], F] =
       Nat(function2K[Scal, Pure](_ => Morphism.fromArrow(CatsMonad[F].pure)))
+    
+    val flatten: Transform[F o F, F] =
+      Nat(function2K[Scal, Flatten](_ => Morphism.fromArrow(CatsMonad[F].flatten)))
 
     def fmap[A, B](f: A -> B): F[A] -> F[B] =
       val arrow: F[A] => F[B] = CatsMonad[F].map(_)(f.arrow)

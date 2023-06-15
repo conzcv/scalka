@@ -12,9 +12,7 @@ trait CoflatMap[
 
   given category: Cat[K, Ob, Arr]
 
-  val coflatten: Transform[F, F o F] =
-    val fun = functionK[K, Ob, Coflatten](ob => coflatMap(ob)(fmap(ob.id[Arr])))
-    Nat(fun)
+  val coflatten: Transform[F, F o F]
 
   final def coflatMap[A <: K, B <: K](ob: Ob[A])(f: F[A] -> B): F[A] -> F[B] =
     coflatten(ob) >> fmap(f)

@@ -39,7 +39,14 @@ trait Adjunction[
       val category = D
       val pure: Transform[IdK[D], RL] = unit
 
-      def fmap[A <: D, B <: D](f: A ~>> B): R[L[A]] ~>> R[L[B]] =
+      val flatten: Transform[[A <: D] =>> RL[RL[A]], RL] =
+        new Transform[[A <: D] =>> RL[RL[A]], RL] {
+          def apply[A <: D](ob: DOb[A]): RL[RL[A]] ~> RL[A] =
+            val id = ob.id[DArr]
+            R.fmap(left(L.fmap(id).domain)(fmap(id)))
+        }
+
+      def fmap[A <: D, B <: D](f: A ~>> B): RL[A] ~>> RL[B] =
         R.fmap(L.fmap(f))
     }
 
@@ -47,6 +54,13 @@ trait Adjunction[
     new Comonad[S, SOb, SArr, LR] {
       val category = S
       val extract: Transform[LR, IdK[S]] = counit
+
+      val coflatten: Transform[LR, [A <: S] =>> LR[LR[A]]] =
+        new Transform[LR, [A <: S] =>> LR[LR[A]]]  {
+          def apply[A <: S](ob: SOb[A]): LR[A] ~> LR[LR[A]] =
+            val id = ob.id[SArr]
+            L.fmap(right(R.fmap(id).codomain)(fmap(id)))
+        }
 
       def fmap[A <: S, B <: S](f: A ->> B): L[R[A]] ->> L[R[B]] =
         L.fmap(R.fmap(f))
