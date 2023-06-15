@@ -16,10 +16,10 @@ import cats.{Traverse => CatsTraverse}
 import cats.Applicative
 
 given ScalCategory2K[~>] = new SimpleCategory[Any2K, Scal2K, ~>] {
-  def composeArrows[F[_], G[_], H[_]](f: CatsFunctionK[G, H], g: CatsFunctionK[F, G]): CatsFunctionK[F, H] =
+  def composeRelations[F[_], G[_], H[_]](f: CatsFunctionK[G, H], g: CatsFunctionK[F, G]): CatsFunctionK[F, H] =
     f compose g
 
-  def idArrow[F[_]](ob: Object[F]): CatsFunctionK[F, F] = CatsFunctionK.id[F]
+  def idRelation[F[_]](ob: Object[F]): CatsFunctionK[F, F] = CatsFunctionK.id[F]
 }
 
 def forgetScalkaFunctorK: Fun[Any2K, Scal2K, Function2K, Any2K, Scal2K, CatsFunctionK, [F[A]] =>> F] =
@@ -31,9 +31,9 @@ def forgetScalkaFunctorK: Fun[Any2K, Scal2K, Function2K, Any2K, Scal2K, CatsFunc
 
 given [Arr[_, _]: Category]: ScalCategory1K[Arr] = new SimpleCategory[Any, Scal, Arr]  {
 
-  def composeArrows[A, B, C](f: Arr[B, C], g: Arr[A, B]): Arr[A, C] =
+  def composeRelations[A, B, C](f: Arr[B, C], g: Arr[A, B]): Arr[A, C] =
     g >>> f
-  def idArrow[A](ob: Object[A]): Arr[A, A] = Category[Arr].id[A]
+  def idRelation[A](ob: Object[A]): Arr[A, A] = Category[Arr].id[A]
 }
 
 def cats2scalkaFunctionK[F[_], G[_]](f: CatsFunctionK[F, G]): FunctionK[Any, F, G] =

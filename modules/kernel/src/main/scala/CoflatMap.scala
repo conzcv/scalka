@@ -5,12 +5,12 @@ import scalka.syntax.functionK.functionK
 trait CoflatMap[
   K <: AnyKind,
   Ob[A <: K],
-  Arr[A <: K, B <: K],
+  Rel[A <: K, B <: K],
   F[A <: K] <: K
-] extends Endofunctor[K, Ob, Arr, F] {
+] extends Endofunctor[K, Ob, Rel, F] {
   type Coflatten[A <: K] = To[F o F, A]
 
-  given category: Cat[K, Ob, Arr]
+  given category: Cat[K, Ob, Rel]
 
   val coflatten: Transform[F, F o F]
 
