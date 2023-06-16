@@ -1,7 +1,7 @@
 package scalka.kernel
 
 import scalka.kernel.types._
-import scalka.instances.functor.ScalInstances
+import scalka.instances.functor.FunctorInstances
 
 trait Functor[
   SKind <: AnyKind,
@@ -35,7 +35,5 @@ object HomCovariant {
       summon
   }
 }
-
-trait FunctorInstances extends ScalInstances
 
 object Functor extends FunctorInstances

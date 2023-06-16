@@ -1,7 +1,7 @@
 package scalka.kernel
 
 import scalka.kernel.types.IdK
-import scalka.instances.adjunction.ScalInstances
+import scalka.instances.adjunction.AdjunctionInstances
 
 trait Adjunction[
   S <: AnyKind, SOb[A <: S], ->[A <: S, B <: S],
@@ -53,7 +53,6 @@ trait Adjunction[
   def monad: Monad[D, DOb, ~>, RL] =
     new Monad[D, DOb, ~>, RL]  { self =>
       val category = D
-
       val pure: Transform[IdK[D], RL] = unit
 
       def  apply[A <: D: DOb]: DOb[RL[A]] =
@@ -111,7 +110,4 @@ trait Adjunction[
         L.fmap(R.fmap(f))
     }
 }
-
-trait AdjunctionInstances extends ScalInstances 
-
 object Adjunction extends AdjunctionInstances
