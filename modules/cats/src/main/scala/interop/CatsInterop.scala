@@ -3,7 +3,6 @@ package scalka.interop.cats
 import cats.Applicative
 import cats.arrow.{Category => CatsCategory}
 import cats.arrow.{FunctionK => CatsFunctionK}
-import cats.syntax.compose._
 import cats.{Functor => CatsFunctor}
 import cats.{Monad => CatsMonad}
 import cats.{Traverse => CatsTraverse}

@@ -1,5 +1,7 @@
 package scalka.kernel
 
+import scalka.syntax.category.* 
+
 trait CoflatMap[
   K <: AnyKind,
   Ob[A <: K],
@@ -16,5 +18,5 @@ trait CoflatMap[
     given fa: Ob[F[A]] = apply[A]
     given fb: Ob[F[B]] = apply[B]
     given ffa: Ob[F[F[A]]] = apply[F[A]]
-    category.compose(fmap(f), coflatten[A])
+    coflatten[A] >>> fmap(f)
 }

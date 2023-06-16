@@ -1,9 +1,18 @@
 package scalka.instances.category
 
 import scalka.kernel.types._
-import scalka.kernel.{Category, Functor, Nat, Monad}
+import scalka.kernel.{Category, Functor, Nat, Monad, Op}
+import scalka.syntax.category.* 
 
 trait CategoryInstances extends ScalInstances with ScalKInstances {
+
+  given [K <: AnyKind, Ob[A <: K], ->[A <: K, B <: K]](using C: Category[K, Ob, ->]): Category[K, Ob, [A <: K, B <: K] =>> Op[K, ->, A, B]] =
+    new Category[K, Ob, [A <: K, B <: K] =>> Op[K, ->, A, B]] {
+      def compose[A <: K: Ob, B <: K: Ob, C <: K: Ob](f: Op[K, ->, B, C], g: Op[K, ->, A, B]): Op[K, ->, A, C] =
+        Op(f.opposite >>> g.opposite)
+      def id[A <: K: Ob]: Op[K, ->, A, A] = Op(C.id[A])
+    }
+
   given [
     S <: AnyKind, SOb[A <: S], ->[A <: S, B <: S],
     D <: AnyKind, DOb[A <: D], ~>[A <: D, B <: D]
@@ -25,13 +34,13 @@ trait CategoryInstances extends ScalInstances with ScalKInstances {
               summon[FunctorOb[F]].apply[A]
 
             def apply[A <: S: SOb]: F[A] ~> H[A] =
-              given fa: DOb[F[A]] = summon[FunctorOb[F]].apply[A]
-              given ga: DOb[G[A]] = summon[FunctorOb[G]].apply[A]
-              given ha: DOb[H[A]] = summon[FunctorOb[H]].apply[A]
-              D.compose(f[A], g[A])
+              given fa: DOb[F[A]] = summon[FunctorOb[F]][A]
+              given ga: DOb[G[A]] = summon[FunctorOb[G]][A]
+              given ha: DOb[H[A]] = summon[FunctorOb[H]][A]
+              g[A] >>> f[A]
 
             def codomain[A <: S: SOb]: DOb[H[A]] =
-              summon[FunctorOb[H]].apply[A]
+              summon[FunctorOb[H]][A]
         }
 
       def id[F[A <: S] <: D: FunctorOb]: NatRelation[F, F] =

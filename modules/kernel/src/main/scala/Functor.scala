@@ -2,20 +2,21 @@ package scalka.kernel
 
 import scalka.kernel.types._
 import scalka.instances.functor.FunctorInstances
+import scalka.syntax.category.* 
 
 trait Functor[
-  SKind <: AnyKind,
-  SOb[A <: SKind],
-  ->[A <: SKind, B <: SKind],
+  S <: AnyKind,
+  SOb[A <: S],
+  ->[A <: S, B <: S],
 
-  DKind <: AnyKind,
-  DOb[A <: DKind],
-  ~>[A <: DKind, B <: DKind],
+  D <: AnyKind,
+  DOb[A <: D],
+  ~>[A <: D, B <: D],
   
-  F[A <: SKind] <: DKind
+  F[A <: S] <: D
 ] {
-  def fmap[A <: SKind: SOb, B <: SKind: SOb](f: A -> B): F[A] ~> F[B]
-  def apply[A <: SKind: SOb]: DOb[F[A]]
+  def fmap[A <: S: SOb, B <: S: SOb](f: A -> B): F[A] ~> F[B]
+  def apply[A <: S: SOb]: DOb[F[A]]
 }
 
 sealed trait HomCovariant[
@@ -29,8 +30,8 @@ object HomCovariant {
     R <: K: Ob
   ](using  C: Category[K, Ob, ->]): HomCovariant[K, Ob, ->, R] = new HomCovariant[K, Ob, ->, R] {
     def fmap[A <: K: Ob, B <: K: Ob](f: A -> B): (R -> A) => (R -> B) =
-      C.compose(f, _)
-
+      ra => ra >>> f
+      
     def apply[A <: K: Ob]: Scal[R -> A] =
       summon
   }

@@ -1,5 +1,7 @@
 package scalka.kernel
 
+import scalka.syntax.category.* 
+
 trait FlatMap[
   K <: AnyKind,
   Ob[A <: K],
@@ -16,5 +18,5 @@ trait FlatMap[
     given fb: Ob[F[B]] = apply[B]
     given fa: Ob[F[A]] = apply[A]
     given ffb: Ob[F[F[B]]] = apply[F[B]]
-    category.compose(flatten[B], fmap(f))
+    fmap(f) >>> flatten[B]
 }
