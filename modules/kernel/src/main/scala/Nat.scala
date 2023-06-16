@@ -1,33 +1,17 @@
 package scalka.kernel
 
 trait Nat[
-  SKind <: AnyKind,
-  SOb[A <: SKind],
+  S <: AnyKind,
+  SOb[A <: S],
 
-  DKind <: AnyKind,
-  DOb[A <: DKind],
-  DRel[A <: DKind, B <: DKind],
+  D <: AnyKind,
+  DOb[A <: D],
+  ~>[A <: D, B <: D],
 
-  F[A <: SKind] <: DKind,
-  G[A <: SKind] <: DKind
+  F[A <: S] <: D,
+  G[A <: S] <: D
 ] {
-  type ~>[A <: DKind, B <: DKind] = Morphism[DKind, DOb, DRel, A, B]
-  def apply[A <: SKind: SOb]: F[A] ~> G[A]
-}
-
-object Nat {
-  def apply[
-    SKind <: AnyKind,
-    SOb[A <: SKind],
-
-    DKind <: AnyKind,
-    DOb[A <: DKind],
-    DRel[A <: DKind, B <: DKind],
-    
-    F[A <: SKind] <: DKind,
-    G[A <: SKind] <: DKind
-  ](f: FunctionK[SKind, SOb, [A <: SKind] =>> Morphism[DKind, DOb, DRel, F[A], G[A]]]) =
-    new Nat[SKind, SOb, DKind, DOb, DRel, F, G] {
-      def apply[A <: SKind: SOb]: F[A] ~> G[A] = f(summon)
-    }
+  def domain[A <: S: SOb]: DOb[F[A]]
+  def apply[A <: S: SOb]: F[A] ~> G[A]
+  def codomain[A <: S: SOb]: DOb[G[A]]
 }

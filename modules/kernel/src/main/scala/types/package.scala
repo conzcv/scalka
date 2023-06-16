@@ -15,7 +15,7 @@ package object types {
   type ScalCategory1K[Arr[_, _]] = Category[Any, Scal, Arr]
   type ScalEndofunctor1K[F[_]] = Endofunctor[Any, Scal, Function, F]
   type ScalMonad1K[F[_]] = Monad[Any, Scal, Function, F]
-  type ScalKleisli1K[F[_], A, B] = Kleisli[Any, Scal, Function, F, A, B]
+  type ScalKleisli1K[F[_], A, B] = Kleisli[Any, Function, F, A, B]
   type ScalTraverse1K[L[_], G[_]] = Traverse[Any, Scal, Function, L, G]
   type ScalAdjunction1K[R[_], L[_]] = Adjunction[Any, Scal, Function, Any, Scal, Function, R, L]
 
@@ -33,13 +33,10 @@ package object types {
   type ScalCategory2K[F[_[_], _[_]]] = Category[Any2K, Scal2K, F]
   type ScalEndofunctor2K[F[G[_]] <: [A] =>> Any] = Endofunctor[Any2K, Scal2K, Function2K, F]
   type ScalMonad2K[F[G[_]] <: [A] =>> Any] = Monad[Any2K, Scal2K, Function2K, F]
-  type ScalKleisli2K[F[G[_]] <: [A] =>> Any, A[_], B[_]] = Kleisli[Any2K, Scal2K, Function2K, F, A, B]
+  type ScalKleisli2K[F[G[_]] <: [A] =>> Any, A[_], B[_]] = Kleisli[Any2K, Function2K, F, A, B]
 
 
-  type Kleisli[K <: AnyKind, Ob[A <: K], Arr[A <: K, B <: K], F[A <: K] <: K, A <: K, B <: K] = Morphism[K, Ob, Arr, A, F[B]]
-
-  type ==>[A, B] = Morphism[Any, Scal, Function, A, B]
-  type -->[F[_], G[_]] = Morphism[Any2K, Scal2K, Function2K, F, G]
+  type Kleisli[K <: AnyKind, ->[A <: K, B <: K], F[A <: K] <: K, A <: K, B <: K] = A -> F[B]
 
   type FunctorCat[
     SKind <: AnyKind, SOb[A <: SKind], SArr[A <: SKind, B <: SKind],
@@ -51,7 +48,7 @@ package object types {
   ]
 
   type KleisliCat[
-    K <: AnyKind, Ob[A <: K], Arr[A <: K, B <: K],
+    K <: AnyKind, Ob[A <: K], ->[A <: K, B <: K],
     F[A <: K] <: K
-  ] = Category[K, Ob, [A <: K, B <: K] =>> Kleisli[K, Ob, Arr, F, A, B]]   
+  ] = Category[K, Ob, [A <: K, B <: K] =>> Kleisli[K, ->, F, A, B]]   
 }

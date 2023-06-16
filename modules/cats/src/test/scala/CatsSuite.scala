@@ -1,10 +1,10 @@
 import scalka.interop.cats.forgetScalkaFunctorK
 import scalka.interop.cats.given
 import scalka.kernel.Monad
-import scalka.kernel.Morphism
 import scalka.kernel.Traverse
 import scalka.kernel.types._
 import scalka.syntax.functionK.function2K
+import scalka.kernel.FunctionK
 
 class CatsSuite extends munit.FunSuite {
   test("cats interop suite") {
@@ -14,11 +14,11 @@ class CatsSuite extends munit.FunSuite {
     summon[ScalTraverse1K[List, Option]]
 
 
-    val morphism: List --> Option =
-       val funK = function2K[List, Option](_.headOption)
-       Morphism.fromRelation(funK)
+    val headOpt: FunctionK[Any, List, Option] =
+       function2K[List, Option](_.headOption)
 
-    val result = forgetScalkaFunctorK.fmap(morphism).relation(List(1678,2,3,4,5,6))
+    val catsFunctionK = forgetScalkaFunctorK.fmap(headOpt)
+    val result = catsFunctionK(List(1678,2,3,4,5,6))
 
     assert(result == Option(1678))
   }

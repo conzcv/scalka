@@ -1,44 +1,41 @@
 package scalka.kernel
 
 import scalka.kernel.types._
+import scalka.instances.functor.ScalInstances
 
 trait Functor[
   SKind <: AnyKind,
   SOb[A <: SKind],
-  SRel[A <: SKind, B <: SKind],
+  ->[A <: SKind, B <: SKind],
 
   DKind <: AnyKind,
   DOb[A <: DKind],
-  DRel[A <: DKind, B <: DKind],
+  ~>[A <: DKind, B <: DKind],
   
   F[A <: SKind] <: DKind
 ] {
-  type ->[A <: SKind, B <: SKind] = Morphism[SKind, SOb, SRel, A, B]
-  type ~>[A <: DKind, B <: DKind] = Morphism[DKind, DOb, DRel, A, B]
-
-  def fmap[A <: SKind, B <: SKind](f: A -> B): F[A] ~> F[B]
+  def fmap[A <: SKind: SOb, B <: SKind: SOb](f: A -> B): F[A] ~> F[B]
+  def apply[A <: SKind: SOb]: DOb[F[A]]
 }
 
 sealed trait HomCovariant[
-  K <: AnyKind, Ob[A <: K], Rel[A <: K, B <: K],
+  K <: AnyKind, Ob[A <: K], ->[A <: K, B <: K],
   R <: K
-] extends Functor[K, Ob, Rel, Any, Scal, Function, [B <: K] =>> Morphism[K, Ob, Rel, R, B]]
+] extends Functor[K, Ob, ->, Any, Scal, Function, [B <: K] =>> R -> B]
 
 object HomCovariant {
   def apply[
-    K <: AnyKind, Ob[A <: K], Rel[A <: K, B <: K],
-    R <: K
-  ](using  C: Category[K, Ob, Rel]): HomCovariant[K, Ob, Rel, R] = new HomCovariant[K, Ob, Rel, R] {
-    def fmap[A <: K, B <: K](f: A -> B): (R -> A) ~> (R -> B) =
-      val relation: (R -> A) => (R -> B) = _ >> f
-      Morphism.fromRelation(relation)
+    K <: AnyKind, Ob[A <: K], ->[A <: K, B <: K],
+    R <: K: Ob
+  ](using  C: Category[K, Ob, ->]): HomCovariant[K, Ob, ->, R] = new HomCovariant[K, Ob, ->, R] {
+    def fmap[A <: K: Ob, B <: K: Ob](f: A -> B): (R -> A) => (R -> B) =
+      C.compose(f, _)
+
+    def apply[A <: K: Ob]: Scal[R -> A] =
+      summon
   }
 }
 
-sealed trait FunInstances {
-  val liftSubtyping = new Functor[Any, Scal, <:<, Any, Scal, Function, Id] {
-    def fmap[A, B](f: A -> B): A ~> B = f.asInstanceOf[A ~> B]
-  }
-}
+trait FunctorInstances extends ScalInstances
 
-object Functor extends FunInstances
+object Functor extends FunctorInstances
