@@ -12,7 +12,7 @@ import scalka.kernel.types._
 import scalka.syntax.functionK.function2K
 import scalka.syntax.category.* 
 
-given ScalCategory2K[~>] = new Category[Any2K, Scal2K, ~>] {
+given Category[Any2K, Scal2K, ~>] = new Category[Any2K, Scal2K, ~>] {
   def compose[F[_]: Scal2K, G[_]: Scal2K, H[_]: Scal2K](f: CatsFunctionK[G, H], g: CatsFunctionK[F, G]): CatsFunctionK[F, H] =
     f compose g
 
@@ -28,7 +28,7 @@ def forgetScalkaFunctorK: Functor[Any2K, Scal2K, Function2K, Any2K, Scal2K, Cats
       summon
   }
 
-given [->[_, _]: CatsCategory]: ScalCategory1K[->] = new Category[Any, Scal, ->]  {
+given [->[_, _]: CatsCategory]: Category[Any, Scal, ->] = new Category[Any, Scal, ->]  {
 
   def compose[A: Scal, B: Scal, C: Scal](f: B -> C, g: A -> B): A -> C =
     g >>> f

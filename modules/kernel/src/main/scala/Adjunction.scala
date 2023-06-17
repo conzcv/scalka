@@ -111,4 +111,18 @@ trait Adjunction[
     }
 }
 
+trait SetAdjunction[R[_], L[_]] extends Adjunction[Any, Scal, Function, Any, Scal, Function, R, L] {
+  final val leftCategory = summon
+  final val rightCategory = summon
+
+  def leftAdj[A, B](a: A)(f: L[A] => B): R[B]
+  def rightAdj[A, B](la: L[A])(f: A => R[B]): B
+
+  def leftAdjunct[A: Scal, B: Scal](f: L[A] => B): A => R[B] =
+    a => leftAdj(a)(f)
+
+  def rightAdjunct[A: Scal, B: Scal](f: A => R[B]): L[A] => B =
+    la => rightAdj(la)(f)
+}
+
 object Adjunction extends AdjunctionInstances

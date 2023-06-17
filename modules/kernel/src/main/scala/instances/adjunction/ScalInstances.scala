@@ -1,19 +1,14 @@
 package scalka.instances.adjunction
 
-import scalka.kernel.types._
-import scalka.kernel._
+import scalka.kernel.SetAdjunction
 
 trait ScalInstances {
-  given [X]: ScalAdjunction1K[X => _, (X, _)] =
-    new ScalAdjunction1K[X => _, (X, _)] {
-      def leftAdjunct[A: Scal, B: Scal](f: ((X, A)) => B): A => (X => B) =
-        a => f(_, a)
-        
-      def rightAdjunct[A: Scal, B: Scal](f: A => (X => B)): ((X, A)) => B =
-        (x, a) => f(a)(x)
+  given [X]: SetAdjunction[X => _, (X, _)] =
+    new SetAdjunction[X => _, (X, _)] {
 
-      val leftCategory = summon
-      val rightCategory = summon
+      def leftAdj[A, B](a: A)(f: ((X, A)) => B): X => B = f(_, a)
+
+      def rightAdj[A, B](xa: (X, A))(f: A => X => B): B = f(xa._2)(xa._1)
       val left = summon
       val right = summon
     }
