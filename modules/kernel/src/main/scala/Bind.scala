@@ -2,18 +2,18 @@ package scalka.kernel
 
 import scalka.syntax.category.* 
 
-trait CoflatMap[
+trait Bind[
   K <: AnyKind, Ob[A <: K], ->[A <: K, B <: K],
   F[A <: K] <: K
 ] extends Endofunctor[K, Ob, ->, F] {
-
+  
   given category: Category[K, Ob, ->]
 
-  def duplicate: Transform[F, F o F]
+  def flatten: Transform[F o F, F]
 
-  def extend[A <: K: Ob, B <: K: Ob](f: F[A] -> B): F[A] -> F[B] =
-    given fa: Ob[F[A]] = apply[A]
+  def bind[A <: K: Ob, B <: K: Ob](f: A -> F[B]): F[A] -> F[B] =
     given fb: Ob[F[B]] = apply[B]
-    given ffa: Ob[F[F[A]]] = apply[F[A]]
-    duplicate.relation[A] >>> fmap(f)
+    given fa: Ob[F[A]] = apply[A]
+    given ffb: Ob[F[F[B]]] = apply[F[B]]
+    fmap(f) >>> flatten.relation[B]
 }

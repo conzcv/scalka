@@ -5,7 +5,7 @@ import scalka.kernel.types._
 trait Monad[
   K <: AnyKind, Ob[A <: K], ->[A <: K, B <: K],
   F[A <: K] <: K
-] extends FlatMap[K, Ob, ->, F] {
+] extends Bind[K, Ob, ->, F] {
   def pure: Transform[IdK[K], F]
 }
 
