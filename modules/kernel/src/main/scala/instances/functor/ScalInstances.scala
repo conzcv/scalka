@@ -1,21 +1,17 @@
 package scalka.instances.functor
 
 import scalka.kernel.types._
-import scalka.kernel.Functor
+import scalka.kernel.{SetEndofunctor, Functor}
 
 trait ScalInstances {
-  given [X]: ScalEndofunctor1K[(X => _)] = new ScalEndofunctor1K[(X => _)] {
-    def apply[A: Scal]: Scal[X => A] = summon
+  given [X]: SetEndofunctor[(X => _)] = new SetEndofunctor[(X => _)] {
 
-    def fmap[A: Scal, B: Scal](f: A => B): (X => A) => (X => B) =
-      xa => xa andThen f
+    override def map[A, B](xa: X => A)(f: A => B): X => B = xa andThen f
   }
 
-  given [X]: ScalEndofunctor1K[(X, _)] = new ScalEndofunctor1K[(X, _)] {
-    def apply[A: Scal]: Scal[(X, A)] = summon
-    
-    def fmap[A: Scal, B: Scal](f: A => B): ((X, A)) => (X, B) =
-      (x, a) => (x, f(a))
+  given [X]: SetEndofunctor[(X, _)] = new SetEndofunctor[(X, _)] {  
+
+    override def map[A, B](fa: (X, A))(f: A => B): (X, B) = (fa._1, f(fa._2))  
   }
 
   given Functor[Any, Scal, <:<, Any, Scal, Function, Id] = new Functor[Any, Scal, <:<, Any, Scal, Function, Id] {

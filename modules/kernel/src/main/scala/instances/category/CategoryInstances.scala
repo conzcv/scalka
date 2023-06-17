@@ -33,11 +33,11 @@ trait CategoryInstances extends ScalInstances with ScalKInstances {
             def domain[A <: S: SOb]: DOb[F[A]] =
               summon[FunctorOb[F]].apply[A]
 
-            def apply[A <: S: SOb]: F[A] ~> H[A] =
+            def relation[A <: S: SOb]: F[A] ~> H[A] =
               given fa: DOb[F[A]] = summon[FunctorOb[F]][A]
               given ga: DOb[G[A]] = summon[FunctorOb[G]][A]
               given ha: DOb[H[A]] = summon[FunctorOb[H]][A]
-              g[A] >>> f[A]
+              g.relation[A] >>> f.relation[A]
 
             def codomain[A <: S: SOb]: DOb[H[A]] =
               summon[FunctorOb[H]][A]
@@ -48,7 +48,7 @@ trait CategoryInstances extends ScalInstances with ScalKInstances {
           def domain[A <: S: SOb]: DOb[F[A]] =
             summon[FunctorOb[F]].apply[A]
 
-          def apply[A <: S: SOb]: F[A] ~> F[A] =
+          def relation[A <: S: SOb]: F[A] ~> F[A] =
             summon[FunctorOb[F]].fmap(S.id[A])
 
           def codomain[A <: S: SOb]: DOb[F[A]] =
@@ -64,10 +64,10 @@ trait CategoryInstances extends ScalInstances with ScalKInstances {
       def compose[A <: K: Ob, B <: K: Ob, C <: K: Ob](f: Kleisli[K, ->, F, B, C],  g: Kleisli[K, ->, F, A, B]): Kleisli[K, ->, F, A, C] =
         given fb: Ob[F[B]] = M.apply[B]
         given fc: Ob[F[C]] = M.apply[C]
-        C.compose(M.flatMap(f), g)
+        C.compose(M.bind(f), g)
 
       def id[A <: K: Ob]: Kleisli[K, ->, F, A, A] =
-        M.pure[A]
+        M.pure.relation[A]
     }
 }
 

@@ -26,7 +26,7 @@ trait Adjunction[
       def domain[A <: D: DOb]: DOb[A] =
         summon
 
-      def apply[A <: D: DOb]: A ~> RL[A] =
+      def relation[A <: D: DOb]: A ~> RL[A] =
         given la: SOb[L[A]] = L[A]
         left(L.fmap(D.id[A]))
 
@@ -41,7 +41,7 @@ trait Adjunction[
         given ra: DOb[R[A]] = R[A]
         L[R[A]]
 
-      def apply[A <: S: SOb]: LR[A] -> A =
+      def relation[A <: S: SOb]: LR[A] -> A =
         given ra: DOb[R[A]] = R[A]
         right(R.fmap(S.id[A]))
 
@@ -65,7 +65,7 @@ trait Adjunction[
             given rla: DOb[RL[A]] = self[A]
             self[RL[A]]
 
-          def apply[A <: D: DOb]: RL[RL[A]] ~> RL[A] =
+          def relation[A <: D: DOb]: RL[RL[A]] ~> RL[A] =
             given rla: DOb[RL[A]] = self[A]
             given la: SOb[L[A]] = L[A]
             given lrla: SOb[L[RL[A]]] = L[R[L[A]]]
@@ -89,11 +89,11 @@ trait Adjunction[
         given ra: DOb[R[A]] = R[A]
         L[R[A]]
 
-      val coflatten: Transform[LR, [A <: S] =>> LR[LR[A]]] =
+      val duplicate: Transform[LR, [A <: S] =>> LR[LR[A]]] =
         new Transform[LR, [A <: S] =>> LR[LR[A]]] {
           def domain[A <: S: SOb]: SOb[LR[A]] = self[A]
 
-          def apply[A <: S: SOb]: LR[A] -> LR[LR[A]] =
+          def relation[A <: S: SOb]: LR[A] -> LR[LR[A]] =
             given ra: DOb[R[A]] = R[A]
             given lra: SOb[LR[A]] = self[A]
             given rlra: DOb[R[LR[A]]] = R[LR[A]]

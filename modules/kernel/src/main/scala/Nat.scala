@@ -12,6 +12,6 @@ trait Nat[
   G[A <: S] <: D
 ] {
   def domain[A <: S: SOb]: DOb[F[A]]
-  def apply[A <: S: SOb]: F[A] ~> G[A]
+  def relation[A <: S: SOb]: F[A] ~> G[A]
   def codomain[A <: S: SOb]: DOb[G[A]]
 }

@@ -10,6 +10,7 @@ import cats.~>
 import scalka.kernel._
 import scalka.kernel.types._
 import scalka.syntax.functionK.function2K
+import scalka.syntax.category.* 
 
 given ScalCategory2K[~>] = new Category[Any2K, Scal2K, ~>] {
   def compose[F[_]: Scal2K, G[_]: Scal2K, H[_]: Scal2K](f: CatsFunctionK[G, H], g: CatsFunctionK[F, G]): CatsFunctionK[F, H] =
@@ -44,42 +45,30 @@ def scalka2catsFunctionK[F[_], G[_]](f: FunctionK[Any, F, G]): CatsFunctionK[F, 
     def apply[A](fa: F[A]): G[A] = f(fa)
   }
 
-given [F[_]: CatsFunctor]: ScalEndofunctor1K[F] =
-  new ScalEndofunctor1K[F] {
-    def fmap[A: Scal, B: Scal](f: A => B): F[A] => F[B] =
-      CatsFunctor[F].fmap(_)(f)
-    
-    def apply[A: Scal]: Scal[F[A]] =
-      summon
+given [F[_]: CatsFunctor]: SetEndofunctor[F] =
+  new SetEndofunctor[F] {
+    def map[A, B](fa: F[A])(f: A => B): F[B] =
+      CatsFunctor[F].map(fa)(f)
   }
 
-given [F[_]: CatsMonad]: ScalMonad1K[F] =
-  new ScalMonad1K[F]{
-    val category: Category[Any, Scal, Function] = summon
+given [F[_]: CatsMonad]: SetMonad[F] =
+  new SetMonad[F]{
+    val category: Category[Any, Scal, Function] =
+      summon
 
-    def apply[A: Scal]: Scal[F[A]] = summon
+    def flatMap[A, B](fa: F[A])(f: A => F[B]): F[B] =
+      CatsMonad[F].flatMap(fa)(f)
 
     val pure: Transform[IdK[Any], F] =
       new Transform[IdK[Any], F] {
         def domain[A: Scal]: Scal[A] = summon
-        def apply[A: Scal]: A => F[A] = CatsMonad[F].pure
+        def relation[A: Scal]: A => F[A] = CatsMonad[F].pure
         def codomain[A: Scal]: Scal[F[A]] = summon
       }
-    
-    val flatten: Transform[F o F, F] =
-      new Transform[F o F, F] {
-        def domain[A: Scal]: Scal[(F o F)[A]] = summon
-        def apply[A: Scal]: (F o F)[A] => F[A] = CatsMonad[F].flatten
-        def codomain[A: Scal]: Scal[F[A]] = summon
-      }
-
-    def fmap[A: Scal, B: Scal](f: A => B): F[A] => F[B] =
-      CatsMonad[F].map(_)(f)
   }
 
-given [L[_]: CatsTraverse, G[_]: Applicative]: ScalTraverse1K[L, G] =
-  new ScalTraverse1K[L, G] {
-    def fmap[A: Scal, B: Scal](f: Kleisli[Any, Function, G, A, B]): Kleisli[Any, Function, G, L[A], L[B]] =
-      (la: L[A]) => CatsTraverse[L].traverse(la)(f)
-    def apply[A: Scal]: Scal[L[A]] = summon
+given [L[_]: CatsTraverse, G[_]: Applicative]: SetTraverse[L, G] =
+  new SetTraverse[L, G] {
+    def traverse[A, B](la: L[A])(f: A => G[B]): G[L[B]] =
+      CatsTraverse[L].traverse(la)(f)
   }
