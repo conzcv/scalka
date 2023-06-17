@@ -15,6 +15,6 @@ trait SetEndofunctor[F[_]] extends Endofunctor[Any, Scal, Function, F] {
 
   final def apply[A: Scal]: Scal[F[A]] = summon
 
-  def fmap[A: Scal, B: Scal](f: A => B): F[A] => F[B] =
+  final def fmap[A: Scal, B: Scal](f: A => B): F[A] => F[B] =
     fa => map(fa)(f)
 }

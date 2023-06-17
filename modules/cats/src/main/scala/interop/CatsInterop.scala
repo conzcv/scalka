@@ -19,14 +19,10 @@ given Category[Any2K, Scal2K, ~>] = new Category[Any2K, Scal2K, ~>] {
   def id[F[_]: Scal2K]: CatsFunctionK[F, F] = CatsFunctionK.id[F]
 }
 
-def forgetScalkaFunctorK: Functor[Any2K, Scal2K, Function2K, Any2K, Scal2K, CatsFunctionK, [F[A]] =>> F] =
-  new Functor[Any2K, Scal2K, Function2K, Any2K, Scal2K, CatsFunctionK, [F[A]] =>> F] {
-    def fmap[F[_]: Scal2K, G[_]: Scal2K](f: Function2K[F, G]): F ~> G =
-      scalka2catsFunctionK(f)
-
-    def apply[F[_]: Scal2K]: Scal2K[F] =
-      summon
-  }
+given ApplicableK[Any, Scal2K, CatsFunctionK] = new ApplicableK[Any, Scal2K, CatsFunctionK] {
+  def toFunctionK[F[_]: Scal2K, G[_]: Scal2K](f: CatsFunctionK[F, G]): FunctionK[Any, F, G] =
+    function2K[F, G](fa => f(fa))
+}
 
 given [->[_, _]: CatsCategory]: Category[Any, Scal, ->] = new Category[Any, Scal, ->]  {
 
@@ -37,8 +33,14 @@ given [->[_, _]: CatsCategory]: Category[Any, Scal, ->] = new Category[Any, Scal
     CatsCategory[->].id[A]
 }
 
-def cats2scalkaFunctionK[F[_], G[_]](f: CatsFunctionK[F, G]): FunctionK[Any, F, G] =
-  function2K[F, G](fa => f(fa))
+def forgetScalkaFunctorK: Functor[Any2K, Scal2K, Function2K, Any2K, Scal2K, CatsFunctionK, [F[A]] =>> F] =
+  new Functor[Any2K, Scal2K, Function2K, Any2K, Scal2K, CatsFunctionK, [F[A]] =>> F] {
+    def fmap[F[_]: Scal2K, G[_]: Scal2K](f: Function2K[F, G]): F ~> G =
+      scalka2catsFunctionK(f)
+
+    def apply[F[_]: Scal2K]: Scal2K[F] =
+      summon
+  }
 
 def scalka2catsFunctionK[F[_], G[_]](f: FunctionK[Any, F, G]): CatsFunctionK[F, G] =
   new CatsFunctionK[F, G] {

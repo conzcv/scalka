@@ -55,10 +55,6 @@ trait Adjunction[
       val category = rightCategory
       val pure: Transform[IdK[D], RL] = unit
 
-      def  apply[A <: D: DOb]: DOb[RL[A]] =
-        given la: SOb[L[A]] = left[A]
-        right[L[A]]
-
       val flatten: Transform[[A <: D] =>> RL[RL[A]], RL] =
         new Transform[[A <: D] =>> RL[RL[A]], RL] {
           def domain[A <: D: DOb]: DOb[RL[RL[A]]] =
@@ -84,11 +80,6 @@ trait Adjunction[
     new Comonad[S, SOb, ->, LR] { self =>
       val category = leftCategory
       val extract: Transform[LR, IdK[S]] = counit
-
-      def apply[A <: S: SOb]: SOb[LR[A]] =
-        given ra: DOb[R[A]] = right[A]
-        left[R[A]]
-
       val duplicate: Transform[LR, [A <: S] =>> LR[LR[A]]] =
         new Transform[LR, [A <: S] =>> LR[LR[A]]] {
           def domain[A <: S: SOb]: SOb[LR[A]] = self[A]

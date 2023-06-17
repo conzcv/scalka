@@ -11,9 +11,12 @@ trait Bind[
 
   def flatten: Transform[F o F, F]
 
+  def apply[A <: K: Ob]: Ob[F[A]] = flatten.codomain[A]
+
+
   def bind[A <: K: Ob, B <: K: Ob](f: A -> F[B]): F[A] -> F[B] =
-    given fb: Ob[F[B]] = apply[B]
-    given fa: Ob[F[A]] = apply[A]
-    given ffb: Ob[F[F[B]]] = apply[F[B]]
+    given fb: Ob[F[B]] = flatten.codomain[B]
+    given fa: Ob[F[A]] = flatten.codomain[A]
+    given ffb: Ob[F[F[B]]] = flatten.domain[B]
     fmap(f) >>> flatten.relation[B]
 }
