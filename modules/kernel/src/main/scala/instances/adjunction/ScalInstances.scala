@@ -9,7 +9,7 @@ trait ScalInstances {
       def leftAdj[A, B](a: A)(f: ((X, A)) => B): X => B = f(_, a)
 
       def rightAdj[A, B](xa: (X, A))(f: A => X => B): B = f(xa._2)(xa._1)
-      val left = summon
-      val right = summon
+      final val left = summon
+      final val right = summon
     }
 }

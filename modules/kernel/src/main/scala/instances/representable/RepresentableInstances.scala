@@ -8,7 +8,7 @@ trait RepresentableInstances {
       new Representable[Any, Ob, ->, Id] {
         type Representation = F[Unit]
         val functor = F.right
-        val rep = F.left[Unit]
+        val representation = F.left[Unit]
         def index[A: Ob](fa: A): F[Unit] -> A = F.rightAdjunct(_ => fa)
         def tabulate[A: Ob](f: F[Unit] -> A): A = F.leftAdjunct(f).apply(())
     }
