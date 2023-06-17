@@ -12,5 +12,4 @@ trait Free[Ob[_], ->[_, _], L[_]] extends Adjunction[Any, Ob, ->, Any, Scal, Fun
     applicable.toFunction(rightAdjunct(f)).apply(fa)
   
   final def construct[A]: Ob[L[A]] = left[A]
-
 }
