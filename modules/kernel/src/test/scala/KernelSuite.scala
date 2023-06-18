@@ -1,5 +1,6 @@
 import scalka.kernel._
 import scalka.kernel.types._
+import scalka.syntax.category.id
 
 class KernelSuite extends munit.FunSuite {
 

@@ -26,6 +26,9 @@ package object types {
 
   type Kleisli[K <: AnyKind, ->[A <: K, B <: K], F[A <: K] <: K, A <: K, B <: K] = A -> F[B]
 
+  type Presheaf[K <: AnyKind, Ob[A <: K], ->[A <: K, B <: K], F[A <: K]] =
+    ScalContravariant[K, Ob, ->, F]
+
   type FunctorCat[
     SKind <: AnyKind, SOb[A <: SKind], SArr[A <: SKind, B <: SKind],
     DKind <: AnyKind, DOb[A <: DKind], DArr[A <: DKind, B <: DKind]

@@ -28,20 +28,8 @@ trait CategoryInstances extends ScalInstances with ScalKInstances {
         F[A <: S] <: D: FunctorOb,
         G[A <: S] <: D: FunctorOb,
         H[A <: S] <: D: FunctorOb
-      ](f: NatRelation[G, H], g: Nat[S, SOb, D, DOb, ~>, F, G]): NatRelation[F, H] =
-        new NatRelation[F, H]  {
-            def domain[A <: S: SOb]: DOb[F[A]] =
-              summon[FunctorOb[F]].apply[A]
-
-            def relation[A <: S: SOb]: F[A] ~> H[A] =
-              given fa: DOb[F[A]] = summon[FunctorOb[F]][A]
-              given ga: DOb[G[A]] = summon[FunctorOb[G]][A]
-              given ha: DOb[H[A]] = summon[FunctorOb[H]][A]
-              g.relation[A] >>> f.relation[A]
-
-            def codomain[A <: S: SOb]: DOb[H[A]] =
-              summon[FunctorOb[H]][A]
-        }
+      ](f: NatRelation[G, H], g: NatRelation[F, G]): NatRelation[F, H] =
+        Nat.compose(f, g)
 
       def id[F[A <: S] <: D: FunctorOb]: NatRelation[F, F] =
         new NatRelation[F, F] {
