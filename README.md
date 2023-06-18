@@ -1,3 +1,3 @@
 # scalka
 
-an attempt to implement some CT abstractions not limited to a specific kind
+an attempt to implement common CT abstractions
