@@ -47,14 +47,14 @@ def scalka2catsFunctionK[F[_], G[_]](f: FunctionK[Any, F, G]): CatsFunctionK[F, 
     def apply[A](fa: F[A]): G[A] = f(fa)
   }
 
-given [F[_]: CatsFunctor]: SetEndofunctor[F] =
-  new SetEndofunctor[F] {
-    def map[A, B](fa: F[A])(f: A => B): F[B] =
+given [F[_]: CatsFunctor]: ScalEndofunctor[F] =
+  new ScalEndofunctor[F] {
+    def map[A: Scal, B: Scal](fa: F[A])(f: A => B): F[B] =
       CatsFunctor[F].map(fa)(f)
   }
 
-given [F[_]: CatsMonad]: SetMonad[F] =
-  new SetMonad[F]{
+given [F[_]: CatsMonad]: ScalMonad[F] =
+  new ScalMonad[F]{
     val category: Category[Any, Scal, Function] =
       summon
 
@@ -69,8 +69,8 @@ given [F[_]: CatsMonad]: SetMonad[F] =
       }
   }
 
-given [L[_]: CatsTraverse, G[_]: Applicative]: SetTraverse[L, G] =
-  new SetTraverse[L, G] {
+given [L[_]: CatsTraverse, G[_]: Applicative]: ScalTraverse[L, G] =
+  new ScalTraverse[L, G] {
     def traverse[A, B](la: L[A])(f: A => G[B]): G[L[B]] =
       CatsTraverse[L].traverse(la)(f)
   }

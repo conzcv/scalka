@@ -10,11 +10,6 @@ trait Endofunctor[
   type Transform[F[A <: K] <: K, G[A <: K] <: K] = Nat[K, Ob, K, Ob, ->, F, G]
 }
 
-trait SetEndofunctor[F[_]] extends Endofunctor[Any, Scal, Function, F] {
-  def map[A, B](fa: F[A])(f: A => B): F[B]
-
-  final def apply[A: Scal]: Scal[F[A]] = summon
-
-  final def fmap[A: Scal, B: Scal](f: A => B): F[A] => F[B] =
-    fa => map(fa)(f)
+trait ScalEndofunctor[F[_]] extends Endofunctor[Any, Scal, Function, F] with ScalFunctor[Any, Scal, Function, F] {
+  def map[A: Scal, B: Scal](fa: F[A])(f: A => B): F[B]
 }

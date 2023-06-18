@@ -9,7 +9,7 @@ trait Monad[
   def pure: Transform[IdK[K], F]
 }
 
-trait SetMonad[F[_]] extends Monad[Any, Scal, Function, F] {
+trait ScalMonad[F[_]] extends Monad[Any, Scal, Function, F] {
 
   def flatMap[A, B](fa: F[A])(f: A => F[B]): F[B]
   def fmap[A: Scal, B: Scal](f: A => B): F[A] => F[B] =

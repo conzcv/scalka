@@ -1,16 +1,17 @@
 import scalka.interop.cats.forgetScalkaFunctorK
 import scalka.interop.cats.given
-import scalka.kernel.{SetMonad, SetEndofunctor, SetTraverse}
+import scalka.kernel.{ScalMonad, ScalEndofunctor, ScalTraverse}
 import scalka.kernel.types._
 import scalka.syntax.functionK.function2K
 import scalka.kernel.FunctionK
+import scalka.syntax.functor.scal.*
 
 class CatsSuite extends munit.FunSuite {
   test("cats interop suite") {
-    summon[SetEndofunctor[Function[Int, _]]]
-    summon[SetMonad[List]]
+    summon[ScalEndofunctor[Function[Int, _]]].yoneda
+    summon[ScalMonad[List]]
     summon[KleisliCat[Any, Scal, Function, List]]
-    summon[SetTraverse[List, Option]]
+    summon[ScalTraverse[List, Option]]
 
 
     val headOpt: FunctionK[Any, List, Option] =

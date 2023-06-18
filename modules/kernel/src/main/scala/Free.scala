@@ -9,7 +9,7 @@ trait Free[Ob[_], ->[_, _], L[_]] extends Adjunction[Any, Ob, ->, Any, Scal, Fun
 
   final def foldMap[A, B: Ob](fa: L[A])(f: A => B): B =
     given Ob[L[A]] = left[A]
-    applicable.toFunction(rightAdjunct(f)).apply(fa)
+    applicable(fa, rightAdjunct(f))
   
   final def instance[A]: Ob[L[A]] = left[A]
 }
