@@ -2,7 +2,7 @@ package scalka.kernel
 
 import scalka.kernel.types._
 
-trait Free[Ob[_], ->[_, _], L[_]] extends Adjunction[Any, Ob, ->, Any, Scal, Function, Id, L] {
+trait Free[Ob[_], ->[_, _], L[_]] extends Adjunction[Ob, ->, Scal, Function, Id, L] {
   given applicable: Applicable[Ob, ->]
   final val right: ScalForgetful[Ob, ->] = summon
   final val rightCategory = summon

@@ -1,10 +1,7 @@
 package scalka.kernel
 
-import scalka.kernel.types.IdK
+import scalka.kernel.types.Id
 
-trait Comonad[
-  K <: AnyKind, Ob[A <: K], ->[A <: K, B <: K],
-  F[A <: K] <: K
-] extends Extend[K, Ob, ->, F] {
-  def extract: Transform[F, IdK[K]]
+trait Comonad[Ob[_], ->[_, _], F[_]] extends Extend[Ob, ->, F] {
+  def extract: Transform[F, Id]
 }

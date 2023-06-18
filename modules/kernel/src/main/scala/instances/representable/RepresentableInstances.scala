@@ -4,8 +4,8 @@ import scalka.kernel.{Representable, Free}
 import scalka.kernel.types.Id
 
 trait RepresentableInstances {
-    given [Ob[_], ->[_, _], F[_]](using F: Free[Ob, ->, F]): Representable.Aux[Any, Ob, ->, Id, F[Unit]] =
-      new Representable[Any, Ob, ->, Id] {
+    given [Ob[_], ->[_, _], F[_]](using F: Free[Ob, ->, F]): Representable.Aux[Ob, ->, Id, F[Unit]] =
+      new Representable[Ob, ->, Id] {
         type Representation = F[Unit]
         val functor = F.right
         val representation = F.left[Unit]

@@ -2,14 +2,11 @@ package scalka.kernel
 
 import scalka.kernel.types._
 
-trait Monad[
-  K <: AnyKind, Ob[A <: K], ->[A <: K, B <: K],
-  F[A <: K] <: K
-] extends Bind[K, Ob, ->, F] {
-  def pure: Transform[IdK[K], F]
+trait Monad[Ob[_], ->[_, _], F[_]] extends Bind[Ob, ->, F] {
+  def pure: Transform[Id, F]
 }
 
-trait ScalMonad[F[_]] extends Monad[Any, Scal, Function, F] {
+trait ScalMonad[F[_]] extends Monad[Scal, Function, F] {
 
   def flatMap[A, B](fa: F[A])(f: A => F[B]): F[B]
   def fmap[A: Scal, B: Scal](f: A => B): F[A] => F[B] =
