@@ -1,6 +1,7 @@
 package scalka.kernel
 
-import scalka.syntax.category.* 
+import scalka.syntax.category.>>>
+import scalka.kernel.types.o
 
 trait Extend[Ob[_], ->[_, _], F[_]] extends Endofunctor[Ob, ->, F] {
 

@@ -2,7 +2,7 @@ package scalka.kernel
 
 import scalka.kernel.types.Scal
 
-trait Contravariant[SOb[_], ->[_, _], DOb[_], ~>[_, _], F[_]] extends Functor[SOb, [A, B] =>> Op[->, A, B], DOb, ~>, F] {
+trait Contravariant[SOb[_], ->[_, _], DOb[_], ~>[_, _], F[_]] extends Functor[SOb,  Op[->, _, _], DOb, ~>, F] {
   def contramap[A: SOb, B: SOb](f: A -> B): F[B] ~> F[A]
 
   def fmap[A: SOb, B: SOb](f: Op[->, A, B]): F[A] ~> F[B] =

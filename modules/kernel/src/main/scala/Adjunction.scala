@@ -4,9 +4,6 @@ import scalka.kernel.types._
 import scalka.instances.adjunction.AdjunctionInstances
 
 trait Adjunction[SOb[_], ->[_, _], DOb[_], ~>[_, _], R[_], L[_]] {
-  type RL[A] = R[L[A]]
-  type LR[A] = L[R[A]]
-
   val leftCategory: Category[SOb, ->]
   val rightCategory: Category[DOb, ~>]
    
@@ -17,27 +14,27 @@ trait Adjunction[SOb[_], ->[_, _], DOb[_], ~>[_, _], R[_], L[_]] {
   def rightAdjunct[A: DOb, B: SOb](f: A ~> R[B]): L[A] -> B
   
 
-  def unit: Nat[DOb, DOb, ~>, Id, RL] =
-    new Nat[DOb, DOb, ~>, Id, RL] {
+  def unit: Nat[DOb, DOb, ~>, Id, R o L] =
+    new Nat[DOb, DOb, ~>, Id, R o L] {
       def domain[A: DOb]: DOb[A] =
         summon
 
-      def relation[A: DOb]: A ~> RL[A] =
+      def relation[A: DOb]: A ~> (R o L)[A] =
         given la: SOb[L[A]] = left[A]
         leftAdjunct(left.fmap(rightCategory.id[A]))
 
-      def codomain[A: DOb]: DOb[RL[A]] =
+      def codomain[A: DOb]: DOb[(R o L)[A]] =
         given la: SOb[L[A]] = left[A]
         right[L[A]]
     }
 
-  def counit: Nat[SOb, SOb, ->, LR, Id] =
-    new Nat[SOb, SOb, ->, LR, Id] {
-      def domain[A: SOb]: SOb[LR[A]] =
+  def counit: Nat[SOb, SOb, ->, L o R, Id] =
+    new Nat[SOb, SOb, ->, L o R, Id] {
+      def domain[A: SOb]: SOb[(L o R)[A]] =
         given ra: DOb[R[A]] = right[A]
         left[R[A]]
 
-      def relation[A: SOb]: LR[A] -> A =
+      def relation[A: SOb]: (L o R)[A] -> A =
         given ra: DOb[R[A]] = right[A]
         rightAdjunct(right.fmap(leftCategory.id[A]))
 
@@ -46,49 +43,49 @@ trait Adjunction[SOb[_], ->[_, _], DOb[_], ~>[_, _], R[_], L[_]] {
 
     }
 
-  def monad: Monad[DOb, ~>, RL] =
-    new Monad[DOb, ~>, RL]  { self =>
+  def monad: Monad[DOb, ~>, R o L] =
+    new Monad[DOb, ~>, R o L]  { self =>
       val category = rightCategory
-      val pure: Transform[Id, RL] = unit
+      val pure: Transform[Id, R o L] = unit
 
-      val flatten: Transform[[A] =>> RL[RL[A]], RL] =
-        new Transform[[A] =>> RL[RL[A]], RL] {
-          def domain[A: DOb]: DOb[RL[RL[A]]] =
-            given rla: DOb[RL[A]] = self[A]
-            self[RL[A]]
+      val flatten: Transform[R o L o R o L, R o L] =
+        new Transform[R o L o R o L, R o L] {
+          def domain[A: DOb]: DOb[(R o L o R o L)[A]] =
+            given rla: DOb[(R o L)[A]] = self[A]
+            self[(R o L)[A]]
 
-          def relation[A: DOb]: RL[RL[A]] ~> RL[A] =
-            given rla: DOb[RL[A]] = self[A]
+          def relation[A: DOb]: (R o L o R o L)[A] ~> (R o L)[A] =
+            given rla: DOb[(R o L)[A]] = self[A]
             given la: SOb[L[A]] = left[A]
-            given lrla: SOb[L[RL[A]]] = left[R[L[A]]]
+            given lrla: SOb[(L o R o L)[A]] = left[R[L[A]]]
             right.fmap(rightAdjunct(fmap(rightCategory.id[A])))
 
-          def codomain[A: DOb]: DOb[RL[A]] = self[A]
+          def codomain[A: DOb]: DOb[(R o L)[A]] = self[A]
         }
 
-      def fmap[A: DOb, B: DOb](f: A ~> B): RL[A] ~> RL[B] =
+      def fmap[A: DOb, B: DOb](f: A ~> B): (R o L)[A] ~> (R o L)[B] =
         given la: SOb[L[A]] = left[A]
         given lb: SOb[L[B]] = left[B]
         right.fmap(left.fmap(f))
     }
 
-  def comonad: Comonad[SOb, ->, LR] =
-    new Comonad[SOb, ->, LR] { self =>
+  def comonad: Comonad[SOb, ->, L o R] =
+    new Comonad[SOb, ->, L o R] { self =>
       val category = leftCategory
-      val extract: Transform[LR, Id] = counit
-      val duplicate: Transform[LR, [A] =>> LR[LR[A]]] =
-        new Transform[LR, [A] =>> LR[LR[A]]] {
-          def domain[A: SOb]: SOb[LR[A]] = self[A]
+      val extract: Transform[L o R, Id] = counit
+      val duplicate: Transform[L o R, L o R o L o R] =
+        new Transform[L o R, L o R o L o R] {
+          def domain[A: SOb]: SOb[(L o R)[A]] = self[A]
 
-          def relation[A: SOb]: LR[A] -> LR[LR[A]] =
+          def relation[A: SOb]: (L o R)[A] -> (L o R o L o R)[A] =
             given ra: DOb[R[A]] = right[A]
-            given lra: SOb[LR[A]] = self[A]
-            given rlra: DOb[R[LR[A]]] = right[LR[A]]
+            given lra: SOb[(L o R)[A]] = self[A]
+            given rlra: DOb[(R o L o R)[A]] = right[(L o R)[A]]
             left.fmap(leftAdjunct(fmap(leftCategory.id[A])))
 
-          def codomain[A: SOb]: SOb[LR[LR[A]]] =
-            given lra: SOb[LR[A]] = self[A]
-            self[LR[A]]
+          def codomain[A: SOb]: SOb[(L o R o L o R)[A]] =
+            given lra: SOb[(L o R)[A]] = self[A]
+            self[(L o R)[A]]
         }
 
       def fmap[A: SOb, B: SOb](f: A -> B): L[R[A]] -> L[R[B]] =

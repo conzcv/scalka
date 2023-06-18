@@ -18,17 +18,9 @@ lazy val kernel =
       name := "scalka-kernel"
     )
 
-lazy val cats =
-  project.in(modules / "cats")
-    .settings(
-      defaultSettings,
-      name := "scalka-cats",
-      libraryDependencies += catsCore
-    ).dependsOn(kernel)
-
 lazy val root = project
   .in(file("."))
   .settings(
     defaultSettings,
     name := "scalka"
-  ).aggregate(kernel, cats)
+  ).aggregate(kernel)
