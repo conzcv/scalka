@@ -15,8 +15,8 @@ trait Functor[
 trait ScalFunctor[K <: AnyKind, Ob[A <: K], ->[A <: K, B <: K], F[A <: K]]
   extends Functor[K, Ob, ->, Any, Scal, Function, F] {
   def map[A <: K: Ob, B <: K: Ob](fa: F[A])(f: A -> B): F[B]
-  final def apply[A <: K: Ob]: Scal[F[A]] = summon
-  final def fmap[A <: K: Ob, B <: K: Ob](f: A -> B): F[A] => F[B] = map(_)(f)
+  def apply[A <: K: Ob]: Scal[F[A]] = summon
+  def fmap[A <: K: Ob, B <: K: Ob](f: A -> B): F[A] => F[B] = map(_)(f)
 }
 
 final case class ScalForgetful[Ob[_], ->[_, _]](applicable: Applicable[Ob, ->]) extends ScalFunctor[Any, Ob, ->, Id] {

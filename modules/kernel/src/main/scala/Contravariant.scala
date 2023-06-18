@@ -9,16 +9,19 @@ trait Contravariant[
 ] extends Functor[S, SOb, [A <: S, B <: S] =>> Op[S, ->, A, B], D, DOb, ~>, F] {
   def contramap[A <: S: SOb, B <: S: SOb](f: A -> B): F[B] ~> F[A]
 
-  final def fmap[A <: S: SOb, B <: S: SOb](f: Op[S, ->, A, B]): F[A] ~> F[B] =
+  def fmap[A <: S: SOb, B <: S: SOb](f: Op[S, ->, A, B]): F[A] ~> F[B] =
     contramap(f.opposite)
 }
 
 trait ScalContravariant[K <: AnyKind, Ob[A <: K], ->[A <: K, B <: K], F[A <: K]]
-  extends Contravariant[K, Ob, ->, Any, Scal, Function, F] {
+  extends ScalFunctor[K, Ob, [A <: K, B <: K] =>> Op[K, ->, A, B], F] with Contravariant[K, Ob, ->, Any, Scal, Function, F] {
     def on[A <: K: Ob, B <: K: Ob](fb: F[B])(f: A -> B): F[A]
+    def map[A <: K: Ob, B <: K: Ob](fa: F[A])(f: Op[K, ->, A, B]): F[B] =
+      on(fa)(f.opposite)
 
-    final def apply[A <: K: Ob]: Scal[F[A]] = summon
+    override def fmap[A <: K: Ob, B <: K: Ob](f: Op[K, ->, A, B]): F[A] => F[B] =
+      on(_)(f.opposite)
 
-    final def contramap[A <: K: Ob, B <: K: Ob](f: A -> B): F[B] => F[A] =
+    def contramap[A <: K: Ob, B <: K: Ob](f: A -> B): F[B] => F[A] =
       fb => on(fb)(f)
   }
