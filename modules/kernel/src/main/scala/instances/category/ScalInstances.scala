@@ -4,7 +4,7 @@ import scalka.kernel.types._
 import scalka.kernel.Category
 
 trait ScalInstances {
-  given Category[Any, Scal, Function] = new Category[Any, Scal, Function] {
+  given Category[Scal, Function] = new Category[Scal, Function] {
     def compose[A: Scal, B: Scal, C: Scal](f: B => C, g: A => B): A => C =
       f compose g
 
@@ -12,7 +12,7 @@ trait ScalInstances {
       identity
   }
 
-  given Category[Any, Scal, <:<] = new Category[Any, Scal, <:<] {
+  given Category[Scal, <:<] = new Category[Scal, <:<] {
     def compose[A: Scal, B: Scal, C: Scal](f: B <:< C, g: A <:< B): A <:< C =
       f compose g
 
