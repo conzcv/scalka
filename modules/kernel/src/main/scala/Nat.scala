@@ -9,6 +9,17 @@ trait Nat[SOb[_], DOb[_], ~>[_, _], F[_], G[_]] {
   def codomain[A: SOb]: DOb[G[A]]
 }
 
+trait NaturalIso[COb[_], DOb[_], ~>[_, _], F[_], G[_]]
+  extends Nat[COb, DOb, ~>, F, G] { self =>
+    def reverseRelation[A: COb]: G[A] ~> F[A]
+
+    final def reverse: Nat[COb, DOb, ~>, G, F] = new Nat[COb, DOb, ~>, G, F] {
+      def domain[A: COb]: DOb[G[A]] = self.codomain[A]
+      def relation[A: COb]: G[A] ~> F[A] = reverseRelation[A]
+      def codomain[A: COb]: DOb[F[A]] = self.domain[A]
+    }
+  }
+
 object Nat {
   def compose[SOb[A], DOb[A], ~>[A, B],F[A], G[A], H[A]](
     f: Nat[SOb, DOb, ~>, G, H],

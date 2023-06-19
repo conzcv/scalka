@@ -10,9 +10,11 @@ package object types {
   type o[F[_], G[_]] = [A] =>> F[G[A]]
 
   type Kleisli[->[_, _], F[_], A, B] = A -> F[B]
+  type Cokleisli[->[_, _], F[_], A, B] = F[A] -> B 
 
   type Presheaf[Ob[_], ->[_, _], F[_]] =
     ScalContravariant[Ob, ->, F]
 
-  type KleisliCat[Ob[A], ->[A, B], F[A]] = Category[Ob, [A, B] =>> Kleisli[->, F, A, B]]   
+  type KleisliCat[Ob[_], ->[_, _], F[_]] = Category[Ob, Kleisli[->, F, _, _]]
+  type CokleisliCat[Ob[_], ->[_ , _], F[_]] = Category[Ob, Cokleisli[->, F, _, _]]   
 }

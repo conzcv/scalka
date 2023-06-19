@@ -18,6 +18,14 @@ lazy val kernel =
       name := "scalka-kernel"
     )
 
+lazy val examples =
+  project.in(modules / "examples")
+    .settings(
+      defaultSettings,
+      libraryDependencies += catsCore,
+      name := "scalka-examples"
+    ).dependsOn(kernel)
+
 lazy val root = project
   .in(file("."))
   .settings(
