@@ -5,7 +5,7 @@ import scalka.kernel.types._
 trait Free[Ob[_], ->[_, _], L[_]] extends Adjunction[Ob, ->, Scal, Function, Id, L] {
   given applicable: Applicable[Ob, ->]
   final val right: ScalForgetful[Ob, ->] = summon
-  final val rightCategory = summon
+  final val rightCategory: Category[Scal, Function] = summon
 
   final def foldMap[A, B: Ob](fa: L[A])(f: A => B): B =
     given Ob[L[A]] = left[A]
