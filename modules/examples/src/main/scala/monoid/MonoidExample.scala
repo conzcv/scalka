@@ -17,7 +17,8 @@ given Applicable[Monoid, MonoidHom] = new Applicable[Monoid, MonoidHom] {
 }
 
 given Category[Monoid, MonoidHom] = new Category[Monoid, MonoidHom] {
-  def compose[A: Monoid, B: Monoid, C: Monoid](f: MonoidHom[B, C], g: MonoidHom[A, B]): MonoidHom[A, C] = ???
+  def compose[A: Monoid, B: Monoid, C: Monoid](f: MonoidHom[B, C], g: MonoidHom[A, B]): MonoidHom[A, C] =
+    MonoidHom(f.toFun compose g.toFun)
   def id[A: Monoid]: MonoidHom[A, A] = MonoidHom(identity)
 }
 
@@ -32,5 +33,6 @@ given Free[Monoid, MonoidHom, List] = new Free[Monoid, MonoidHom, List] {
   val applicable = summon
 
   def leftAdjunct[A: Scal, B: Monoid](f: MonoidHom[List[A], B]): A => B = a => f(List(a))
-  def rightAdjunct[A: Scal, B: Monoid](f: A => B): MonoidHom[List[A], B] = MonoidHom(_.foldMap(f))
+  def rightAdjunct[A: Scal, B: Monoid](f: A => B): MonoidHom[List[A], B] =
+    MonoidHom(_.foldMap(f))
 }
