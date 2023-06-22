@@ -31,4 +31,4 @@ lazy val root = project
   .settings(
     defaultSettings,
     name := "scalka"
-  ).aggregate(kernel)
+  ).aggregate(kernel, examples)

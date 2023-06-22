@@ -47,7 +47,7 @@ trait ScalMonad[F[_]] extends Monad[Scal, Function, F] {
 
   def flatMap[A, B](fa: F[A])(f: A => F[B]): F[B]
   def fmap[A: Scal, B: Scal](f: A => B): F[A] => F[B] =
-    fa => flatMap(fa)(f andThen pure[B])
+    fa => flatMap(fa)(pure[B] compose f)
 
   val pure: Transform[Id, F] =
     new Transform[Id, F] {

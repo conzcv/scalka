@@ -14,7 +14,7 @@ trait ScalFunctor[Ob[A], ->[A, B], F[A]] extends Functor[Ob, ->, Scal, Function,
   def fmap[A: Ob, B: Ob](f: A -> B): F[A] => F[B] = map(_)(f)
 }
 
-final case class ScalForgetful[Ob[_], ->[_, _]](applicable: Applicable[Ob, ->]) extends ScalFunctor[ Ob, ->, Id] {
+final case class ScalForgetful[Ob[_], ->[_, _]](applicable: Applicable[Ob, ->]) extends ScalFunctor[Ob, ->, Id] {
   def map[A: Ob, B: Ob](fa: A)(f: A -> B): B = applicable(fa, f)
 }
 

@@ -38,3 +38,24 @@ object Comonad {
         a.left.fmap(a.right.fmap(f))
     }
 }
+
+trait ScalComonad[F[_]] extends Comonad[Scal, Function, F] {
+  def coflatMap[A, B](fa: F[A])(f: F[A] => B): F[B]
+  def extract[A](fa: F[A]): A
+
+  def fmap[A: Scal, B: Scal](f: A => B): F[A] => F[B] =
+    fa => coflatMap(fa)(f compose extract[A])
+
+  val extract: Transform[F, Id] = new Transform[F, Id] {
+    def domain[A: Scal]: Scal[F[A]] = summon
+    def relation[A: Scal]: F[A] => A = extract[A]
+    def codomain[A: Scal]: Scal[A] = summon
+  }
+
+  val duplicate: Transform[F, F o F] = new Transform[F, F o F] {
+    def codomain[A: Scal]: Scal[F[F[A]]] = summon
+    def relation[A: Scal]: F[A] => F[F[A]] =
+      fa => coflatMap(fa)(identity)
+    def domain[A: Scal]: Scal[F[A]] = summon
+  }
+}

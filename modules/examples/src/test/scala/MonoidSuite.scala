@@ -6,11 +6,16 @@ import scalka.syntax.free.*
 import scalka.kernel.Comonad
 import scalka.kernel.types.Id
 import cats.kernel.Monoid
+import scalka.kernel.Applicable
 
 class MonoidSuite extends munit.FunSuite {
   type ==>[A, B] = MonoidHom[A, B]
   val one: Id[Int] = 42
   val indexed: List[Unit] ==> Int = one.index[Monoid, ==>]
+
+  extension [A: Monoid, B: Monoid](f: A ==> B) {
+    def apply(a: A)(using A: Applicable[Monoid, ==>]) = A.apply(a, f)
+  }
 
   test("index") {
     val fourUnit = () +: () +: () +: () +: Nil
