@@ -11,7 +11,7 @@ trait Representable[Ob[_], ->[_, _], F[_]] {
 }
 
 object Representable extends RepresentableInstances {
-  type Aux[Ob[A], ->[A, B], F[A], R] =
+  type Aux[Ob[_], ->[_, _], F[_], R] =
     Representable[Ob, ->, F] {
       type Representation = R
     }

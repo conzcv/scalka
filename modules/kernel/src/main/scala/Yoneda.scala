@@ -8,7 +8,7 @@ sealed trait Yoneda[Ob[_], ->[_, _], F[_]] {
 }
 
 object Yoneda {
-  def forFunctor[Ob[A], ->[A, B], F[A]](
+  def forFunctor[Ob[_], ->[_, _], F[_]](
     functor: ScalFunctor[Ob, ->, F]
   )(using category: Category[Ob, ->]): Yoneda[Ob, ->, F] = new Yoneda[Ob, ->, F] {
     def delay[A: Ob](fa: F[A]): ScalNat[Ob, Cov[->, A], F] =
